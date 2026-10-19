@@ -1,0 +1,85 @@
+networks:
+  dev:
+    driver: bridge
+
+volumes:
+  db-data:
+  pgadmin-data:
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: src/Api/Dockerfile
+      target: final
+    ports:
+      - 8080:8080
+    environment:
+      - ConnectionStrings__db=User ID=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Host=${POSTGRES_HOST};Port=${POSTGRES_PORT};Database=${POSTGRES_DB};Gss Encryption Mode=Disable;
+      - ConnectionStrings__cache=${REDIS_HOST}:${REDIS_PORT}
+      - ASPNETCORE_URLS=http://+:8080
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Jwt__Secret=${Jwt__Secret}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - dev
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    restart: always
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -h postgres -d ${POSTGRES_DB}"]
+      interval: 10s
+      retries: 5
+      start_period: 10s
+      timeout: 5s
+    networks:
+      - dev
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com 
+      PGADMIN_DEFAULT_PASSWORD: admin 
+      PGADMIN_CONFIG_SERVER_MODE: "False" 
+      PGADMIN_LISTEN_PORT: 80
+      PGADMIN_ADD_SERVER__1__NAME: 
+      PGADMIN_ADD_SERVER__1__HOST: ${POSTGRES_HOST:-postgres}
+      PGADMIN_ADD_SERVER__1__PORT: ${POSTGRES_PORT:-5432} 
+      PGADMIN_ADD_SERVER__1__USERNAME: ${POSTGRES_USER} 
+      PGADMIN_ADD_SERVER__1__PASSWORD: ${POSTGRES_PASSWORD}
+      PGADMIN_ADD_SERVER__1__SSLMODE: prefer
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    networks:
+      - dev
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  redis:
+    image: redis:8.2
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    networks:
+      - dev
+    restart: unless-stopped
