@@ -6,7 +6,7 @@ using Domain.Common;
 namespace Application.Features.Todos.Delete;
 public sealed class DeleteTodoCommandHandler(IAppDbContext dbContext) : ICommandHandler<DeleteTodoCommand>
 {
-    public async Task<Result> HandleAsync(DeleteTodoCommand command, CancellationToken cancellationToken = default)
+    public async Task<Result> Handle(DeleteTodoCommand command, CancellationToken cancellationToken = default)
     {
         var todo = await dbContext.Todos.FindAsync([command.Id], cancellationToken);
         if (todo is null)

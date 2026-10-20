@@ -8,9 +8,9 @@ using Microsoft.AspNetCore.Identity;
 namespace Application.Features.Identity.Login;
 public sealed class LoginCommandHandler(
     UserManager<ApplicationUser> userManager,
-    ITokenService tokenService) : ICommandHandler<LoginCommand, Result<TokenResponse>>
+    ITokenService tokenService) : ICommandHandler<LoginCommand, TokenResponse>
 {
-    public async Task<Result<TokenResponse>> HandleAsync(LoginCommand command, CancellationToken cancellationToken = default)
+    public async Task<Result<TokenResponse>> Handle(LoginCommand command, CancellationToken cancellationToken = default)
     {
         var user = await userManager.FindByEmailAsync(command.Email);
         if (user is null)

@@ -19,7 +19,7 @@ public sealed class DeleteTodoCommandHandlerTests
         var handler = new DeleteTodoCommandHandler(dbContext);
 
         // Act
-        var result = await handler.HandleAsync(new DeleteTodoCommand(todo.Id), TestContext.Current.CancellationToken);
+        var result = await handler.Handle(new DeleteTodoCommand(todo.Id), TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -34,7 +34,7 @@ public sealed class DeleteTodoCommandHandlerTests
         var handler = new DeleteTodoCommandHandler(dbContext);
 
         // Act
-        var result = await handler.HandleAsync(new DeleteTodoCommand(Guid.NewGuid()), TestContext.Current.CancellationToken);
+        var result = await handler.Handle(new DeleteTodoCommand(Guid.NewGuid()), TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();

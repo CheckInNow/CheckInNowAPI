@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 namespace Application.Features.Identity.Register;
 public sealed class RegisterCommandHandler(UserManager<ApplicationUser> userManager) : ICommandHandler<RegisterCommand>
 {
-    public async Task<Result> HandleAsync(RegisterCommand command, CancellationToken cancellationToken = default)
+    public async Task<Result> Handle(RegisterCommand command, CancellationToken cancellationToken = default)
     {
         var existingUser = await userManager.FindByEmailAsync(command.Email);
         if (existingUser is not null)

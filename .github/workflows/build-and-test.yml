@@ -21,10 +21,10 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Restore
-        run: dotnet restore src/CleanArchBoilerplate.slnx
+        run: dotnet restore src/CheckInNow.slnx
 
       - name: Build
-        run: dotnet build src/CleanArchBoilerplate.slnx --no-restore --configuration Release --warnaserror
+        run: dotnet build src/CheckInNow.slnx --no-restore --configuration Release --warnaserror
 
       - name: Test
-        run: dotnet test src/CleanArchBoilerplate.slnx --no-build --configuration Release --verbosity minimal
+        run: dotnet test src/CheckInNow.slnx --no-build --configuration Release --verbosity minimal

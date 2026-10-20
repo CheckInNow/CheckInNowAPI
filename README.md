@@ -13,7 +13,7 @@ Built with the latest packages, zero commercial dependencies, and everything you
 | **Architecture** | Clean Architecture (Domain, Application, Infrastructure, Api) |
 | **Runtime** | .NET 10 / C# 14 |
 | **API** | Minimal APIs with TypedResults |
-| **CQRS** | Manual handlers — zero dependencies, zero licensing risk |
+| **CQRS** | MediatR |
 | **Validation** | FluentValidation 12 + Result pattern |
 | **Errors** | ProblemDetails (RFC 9457) + global exception handler |
 | **Database** | EF Core 10 + PostgreSQL |
@@ -94,7 +94,7 @@ Open the Aspire Dashboard URL from the console output to see your telemetry.
 ### Run without Aspire
 
 ```bash
-# Start dependencies
+cp .env.example .env
 docker compose up --build 
 ```
 
@@ -103,14 +103,14 @@ docker compose up --build
 Navigate to `https://localhost:7200/scalar/v1` for the interactive Scalar API docs.
 
 **Default admin credentials** (seeded automatically):
-- Email: `admin@example.com`
+- Email: `admin@example.dev`
 - Password: `Admin123!`
 
 ### Run Tests
 
 ```bash
 cd src
-dotnet test CWM.CleanArchitecture.slnx
+dotnet test CheckInNow.slnx
 ```
 
 ## Sample: Todos Feature
@@ -144,7 +144,3 @@ Follow the Todos pattern:
 | **Result pattern** over exceptions | Explicit error handling, no hidden control flow, better API contracts. |
 | **Manual handler registration** over Scrutor | Zero dependencies for DI scanning. Assembly reflection is 40 lines of code. |
 | **.slnx** over .sln | XML-based, merge-friendly, smaller, future of .NET solutions. |
-
-## License
-
-MIT License. Use it, modify it, ship it. Attribution appreciated but not required.

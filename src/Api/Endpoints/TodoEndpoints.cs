@@ -1,13 +1,13 @@
 using Api.Extensions;
 using Api.Requests.Todos;
-using Application.Abstractions.Messaging;
 using Application.Features.Todos.Complete;
 using Application.Features.Todos.Create;
 using Application.Features.Todos.Delete;
 using Application.Features.Todos.Get;
 using Application.Features.Todos.GetAll;
 using Application.Features.Todos.Update;
-using Domain.Common;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Endpoints;
 public static class TodoEndpoints
@@ -27,12 +27,10 @@ public static class TodoEndpoints
             .WithSummary("Get a todo by ID");
 
         group.MapPost("/", Create)
-            .AddEndpointFilter<ValidationFilter<CreateTodoCommand>>()
             .WithName("CreateTodo")
             .WithSummary("Create a new todo");
 
         group.MapPut("/{id:guid}", Update)
-            .AddEndpointFilter<ValidationFilter<UpdateTodoRequest>>()
             .WithName("UpdateTodo")
             .WithSummary("Update an existing todo");
 
@@ -48,60 +46,61 @@ public static class TodoEndpoints
     private static async Task<IResult> GetAll(
         int? page,
         int? pageSize,
-        IQueryHandler<GetAllTodosQuery, Result<PagedResult<TodoDetailResponse>>> handler,
+        [FromServices] ISender sender,
         CancellationToken cancellationToken)
     {
         var query = new GetAllTodosQuery(page ?? 1, pageSize ?? 10);
-        var result = await handler.HandleAsync(query, cancellationToken);
+        var result = await sender.Send(query, cancellationToken);
         return result.IsSuccess ? TypedResults.Ok(result.Value) : result.ToProblemDetails();
     }
 
     private static async Task<IResult> GetById(
-        Guid id,
-        IQueryHandler<GetTodoQuery, Result<TodoDetailResponse>> handler,
+        [FromRoute] Guid id,
+        [FromServices] ISender sender,
         CancellationToken cancellationToken)
     {
-        var result = await handler.HandleAsync(new GetTodoQuery(id), cancellationToken);
+        var result = await sender.Send(new GetTodoQuery(id), cancellationToken);
         return result.IsSuccess ? TypedResults.Ok(result.Value) : result.ToProblemDetails();
     }
 
     private static async Task<IResult> Create(
-        CreateTodoCommand command,
-        ICommandHandler<CreateTodoCommand, Result<CreateTodoResponse>> handler,
+        [FromBody] CreateTodoRequest request,
+        [FromServices] ISender sender,
         CancellationToken cancellationToken)
     {
-        var result = await handler.HandleAsync(command, cancellationToken);
+        var command = new CreateTodoCommand(request.Title, request.Description);
+        var result = await sender.Send(command, cancellationToken);
         return result.IsSuccess
             ? TypedResults.CreatedAtRoute(result.Value, "GetTodoById", new { id = result.Value!.Id })
             : result.ToProblemDetails();
     }
 
     private static async Task<IResult> Update(
-        Guid id,
-        UpdateTodoRequest request,
-        ICommandHandler<UpdateTodoCommand, Result> handler,
+        [FromRoute] Guid id,
+        [FromBody] UpdateTodoRequest request,
+        [FromServices] ISender sender,
         CancellationToken cancellationToken)
     {
         var command = new UpdateTodoCommand(id, request.Title, request.Description);
-        var result = await handler.HandleAsync(command, cancellationToken);
+        var result = await sender.Send(command, cancellationToken);
         return result.IsSuccess ? TypedResults.NoContent() : result.ToProblemDetails();
     }
 
     private static async Task<IResult> Complete(
-        Guid id,
-        ICommandHandler<CompleteTodoCommand, Result> handler,
+        [FromRoute] Guid id,
+        [FromServices] ISender sender,
         CancellationToken cancellationToken)
     {
-        var result = await handler.HandleAsync(new CompleteTodoCommand(id), cancellationToken);
+        var result = await sender.Send(new CompleteTodoCommand(id), cancellationToken);
         return result.IsSuccess ? TypedResults.NoContent() : result.ToProblemDetails();
     }
 
     private static async Task<IResult> Delete(
-        Guid id,
-        ICommandHandler<DeleteTodoCommand, Result> handler,
+        [FromRoute] Guid id,
+        [FromServices] ISender sender,
         CancellationToken cancellationToken)
     {
-        var result = await handler.HandleAsync(new DeleteTodoCommand(id), cancellationToken);
+        var result = await sender.Send(new DeleteTodoCommand(id), cancellationToken);
         return result.IsSuccess ? TypedResults.NoContent() : result.ToProblemDetails();
     }
 }

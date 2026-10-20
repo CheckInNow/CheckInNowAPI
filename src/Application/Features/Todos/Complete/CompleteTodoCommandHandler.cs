@@ -6,7 +6,7 @@ using Domain.Common;
 namespace Application.Features.Todos.Complete;
 public sealed class CompleteTodoCommandHandler(IAppDbContext dbContext) : ICommandHandler<CompleteTodoCommand>
 {
-    public async Task<Result> HandleAsync(CompleteTodoCommand command, CancellationToken cancellationToken = default)
+    public async Task<Result> Handle(CompleteTodoCommand command, CancellationToken cancellationToken = default)
     {
         var todo = await dbContext.Todos.FindAsync([command.Id], cancellationToken);
         if (todo is null)

@@ -6,9 +6,9 @@ using Domain.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.Todos.GetAll;
-public sealed class GetAllTodosQueryHandler(IAppDbContext dbContext) : IQueryHandler<GetAllTodosQuery, Result<PagedResult<TodoDetailResponse>>>
+public sealed class GetAllTodosQueryHandler(IAppDbContext dbContext) : IQueryHandler<GetAllTodosQuery, PagedResult<TodoDetailResponse>>
 {
-    public async Task<Result<PagedResult<TodoDetailResponse>>> HandleAsync(GetAllTodosQuery query, CancellationToken cancellationToken = default)
+    public async Task<Result<PagedResult<TodoDetailResponse>>> Handle(GetAllTodosQuery query, CancellationToken cancellationToken = default)
     {
         var totalCount = await dbContext.Todos.CountAsync(cancellationToken);
 

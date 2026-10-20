@@ -1,12 +1,11 @@
-
+using Application.Abstractions.Messaging;
 using Domain.Common;
+using MediatR;
 
 namespace Application.Abstractions.Messaging;
-public interface ICommandHandler<in TCommand> : ICommandHandler<TCommand, Result>
+
+public interface ICommandHandler<TCommand> : IRequestHandler<TCommand, Result>
     where TCommand : ICommand;
 
-public interface ICommandHandler<in TCommand, TResponse>
-    where TCommand : ICommand<TResponse>
-{
-    Task<TResponse> HandleAsync(TCommand command, CancellationToken cancellationToken = default);
-}
+public interface ICommandHandler<TCommand, TResponse> : IRequestHandler<TCommand, Result<TResponse>>
+    where TCommand : ICommand<TResponse>;

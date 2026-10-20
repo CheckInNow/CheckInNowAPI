@@ -5,9 +5,9 @@ using Domain.Common;
 using Domain.Entities;
 
 namespace Application.Features.Todos.Create;
-public sealed class CreateTodoCommandHandler(IAppDbContext dbContext) : ICommandHandler<CreateTodoCommand, Result<CreateTodoResponse>>
+public sealed class CreateTodoCommandHandler(IAppDbContext dbContext) : ICommandHandler<CreateTodoCommand, CreateTodoResponse>
 {
-    public async Task<Result<CreateTodoResponse>> HandleAsync(CreateTodoCommand command, CancellationToken cancellationToken = default)
+    public async Task<Result<CreateTodoResponse>> Handle(CreateTodoCommand command, CancellationToken cancellationToken = default)
     {
         var todo = new TodoItem
         {

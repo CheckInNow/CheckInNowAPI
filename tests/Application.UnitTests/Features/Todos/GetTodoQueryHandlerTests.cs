@@ -19,7 +19,7 @@ public sealed class GetTodoQueryHandlerTests
         var handler = new GetTodoQueryHandler(dbContext);
 
         // Act
-        var result = await handler.HandleAsync(new GetTodoQuery(todo.Id), TestContext.Current.CancellationToken);
+        var result = await handler.Handle(new GetTodoQuery(todo.Id), TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -34,8 +34,8 @@ public sealed class GetTodoQueryHandlerTests
         var handler = new GetTodoQueryHandler(dbContext);
 
         // Act
-        var result = await handler.HandleAsync(new GetTodoQuery(Guid.NewGuid()), TestContext.Current.CancellationToken);
-
+        var result = await handler.Handle(new GetTodoQuery(Guid.NewGuid()), TestContext.Current.CancellationToken);
+            
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error!.Type.Should().Be(ErrorType.NotFound);

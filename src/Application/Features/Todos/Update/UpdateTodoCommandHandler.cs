@@ -6,7 +6,7 @@ using Domain.Common;
 namespace Application.Features.Todos.Update;
 public sealed class UpdateTodoCommandHandler(IAppDbContext dbContext) : ICommandHandler<UpdateTodoCommand>
 {
-    public async Task<Result> HandleAsync(UpdateTodoCommand command, CancellationToken cancellationToken = default)
+    public async Task<Result> Handle(UpdateTodoCommand command, CancellationToken cancellationToken = default)
     {
         var todo = await dbContext.Todos.FindAsync([command.Id], cancellationToken);
         if (todo is null)

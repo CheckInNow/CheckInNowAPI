@@ -41,7 +41,7 @@ try
         options.AddDocumentTransformer((document, _, _) =>
         {
             var info = document.Info ?? new Microsoft.OpenApi.OpenApiInfo();
-            info.Title = "Clean Architecture API v1.0.0";
+            info.Title = "CheckInNow API v1.0.0";
             document.Info = info;
 
             var components = document.Components ?? new Microsoft.OpenApi.OpenApiComponents();

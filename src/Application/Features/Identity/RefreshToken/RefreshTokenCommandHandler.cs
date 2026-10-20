@@ -4,9 +4,9 @@ using Application.Abstractions.Messaging;
 using Domain.Common;
 
 namespace Application.Features.Identity.RefreshToken;
-public sealed class RefreshTokenCommandHandler(ITokenService tokenService) : ICommandHandler<RefreshTokenCommand, Result<TokenResponse>>
+public sealed class RefreshTokenCommandHandler(ITokenService tokenService) : ICommandHandler<RefreshTokenCommand, TokenResponse>
 {
-    public async Task<Result<TokenResponse>> HandleAsync(RefreshTokenCommand command, CancellationToken cancellationToken = default)
+    public async Task<Result<TokenResponse>> Handle(RefreshTokenCommand command, CancellationToken cancellationToken = default)
     {
         try
         {

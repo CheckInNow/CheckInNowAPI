@@ -14,7 +14,7 @@ public sealed class CreateTodoCommandHandlerTests
         var command = new CreateTodoCommand("Test Todo", "Test Description");
 
         // Act
-        var result = await handler.HandleAsync(command, TestContext.Current.CancellationToken);
+        var result = await handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -32,7 +32,7 @@ public sealed class CreateTodoCommandHandlerTests
         var command = new CreateTodoCommand("My Task", "Some details");
 
         // Act
-        await handler.HandleAsync(command, TestContext.Current.CancellationToken);
+        await handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         var todo = dbContext.Todos.Single();

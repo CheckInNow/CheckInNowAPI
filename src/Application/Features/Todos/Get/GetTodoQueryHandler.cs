@@ -4,9 +4,9 @@ using Application.Abstractions.Messaging;
 using Domain.Common;
 
 namespace Application.Features.Todos.Get;
-public sealed class GetTodoQueryHandler(IAppDbContext dbContext) : IQueryHandler<GetTodoQuery, Result<TodoDetailResponse>>
+public sealed class GetTodoQueryHandler(IAppDbContext dbContext) : IQueryHandler<GetTodoQuery, TodoDetailResponse>
 {
-    public async Task<Result<TodoDetailResponse>> HandleAsync(GetTodoQuery query, CancellationToken cancellationToken = default)
+    public async Task<Result<TodoDetailResponse>> Handle(GetTodoQuery query, CancellationToken cancellationToken = default)
     {
         var todo = await dbContext.Todos.FindAsync([query.Id], cancellationToken);
         if (todo is null)

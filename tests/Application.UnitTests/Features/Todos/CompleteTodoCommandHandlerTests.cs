@@ -19,7 +19,7 @@ public sealed class CompleteTodoCommandHandlerTests
         var handler = new CompleteTodoCommandHandler(dbContext);
 
         // Act
-        var result = await handler.HandleAsync(new CompleteTodoCommand(todo.Id), TestContext.Current.CancellationToken);
+        var result = await handler.Handle(new CompleteTodoCommand(todo.Id), TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -36,7 +36,7 @@ public sealed class CompleteTodoCommandHandlerTests
         var handler = new CompleteTodoCommandHandler(dbContext);
 
         // Act
-        var result = await handler.HandleAsync(new CompleteTodoCommand(Guid.NewGuid()), TestContext.Current.CancellationToken);
+        var result = await handler.Handle(new CompleteTodoCommand(Guid.NewGuid()), TestContext.Current.CancellationToken);
 
         // Assert
         result.IsFailure.Should().BeTrue();
