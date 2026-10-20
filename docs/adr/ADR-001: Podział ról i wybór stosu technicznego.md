@@ -18,9 +18,9 @@ Potrzebujemy wspólnego sposobu dokumentowania decyzji, planowania prac i okreś
 
 ## Podział ról w projekcie
 
-[Julia](https://github.com/1JuliaKozlowska) - project manager / backend
-[Stanislav](https://github.com/stanislavzhukk) - backend / tester / devops
-[Paweł](https://github.com/PawelMiedzinski) - frontend / tester
+[Julia](https://github.com/1JuliaKozlowska) - project manager / backend  
+[Stanislav](https://github.com/stanislavzhukk) - backend / tester / devops  
+[Paweł](https://github.com/PawelMiedzinski) - frontend / tester  
 
 ## Rozważane rozwiązania
 
