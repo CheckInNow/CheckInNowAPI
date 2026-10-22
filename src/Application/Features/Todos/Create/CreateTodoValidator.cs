@@ -2,6 +2,7 @@
 using FluentValidation;
 
 namespace Application.Features.Todos.Create;
+
 public sealed class CreateTodoValidator : AbstractValidator<CreateTodoCommand>
 {
     public CreateTodoValidator()

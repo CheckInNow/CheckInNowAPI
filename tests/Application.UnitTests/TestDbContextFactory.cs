@@ -3,6 +3,7 @@ using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.UnitTests;
+
 public static class TestDbContextFactory
 {
     public static AppDbContext Create()

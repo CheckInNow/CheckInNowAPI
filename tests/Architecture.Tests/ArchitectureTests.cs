@@ -4,6 +4,7 @@ using FluentAssertions;
 using NetArchTest.Rules;
 
 namespace Architecture.Tests;
+
 public sealed class ArchitectureTests
 {
     private static readonly Assembly DomainAssembly = typeof(Domain.Common.BaseEntity).Assembly;

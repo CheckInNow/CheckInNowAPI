@@ -3,6 +3,7 @@ using Application.Features.Todos.Create;
 using FluentAssertions;
 
 namespace Application.UnitTests.Features.Todos;
+
 public sealed class CreateTodoCommandHandlerTests
 {
     [Fact]

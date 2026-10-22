@@ -2,8 +2,10 @@
 using System.Text;
 using Application.Abstractions.Data;
 using Application.Abstractions.Identity;
+using Application.Abstractions.OAuth;
 using Domain.Entities;
 using Infrastructure.Identity;
+using Infrastructure.OAuth;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -12,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Infrastructure;
+
 public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
@@ -69,6 +72,7 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<ICurrentUser, CurrentUser>();
+        services.AddScoped<IGoogleTokenValidator, GoogleTokenValidator>();
     }
 
     private static void AddCachingServices(this IServiceCollection services)

@@ -18,9 +18,11 @@ var redis = builder.AddRedis("cache")
     .WithLifetime(ContainerLifetime.Persistent);
 
 var jwtSecret = builder.AddParameter("jwt-secret", secret: true);
+var googleClientId = builder.AddParameter("google-client-id", secret: true);
 
 builder.AddProject<Projects.Api>("api")
     .WithEnvironment("Jwt__Secret", jwtSecret)
+    .WithEnvironment("Authentication__Google__ClientId", googleClientId)
     .WithReference(database)
     .WaitFor(database)
     .WithReference(redis)

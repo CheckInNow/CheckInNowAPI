@@ -5,6 +5,7 @@ using Domain.Entities;
 using FluentAssertions;
 
 namespace Application.UnitTests.Features.Todos;
+
 public sealed class GetTodoQueryHandlerTests
 {
     [Fact]
@@ -35,7 +36,7 @@ public sealed class GetTodoQueryHandlerTests
 
         // Act
         var result = await handler.Handle(new GetTodoQuery(Guid.NewGuid()), TestContext.Current.CancellationToken);
-            
+
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error!.Type.Should().Be(ErrorType.NotFound);

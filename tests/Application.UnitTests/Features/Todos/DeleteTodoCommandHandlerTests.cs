@@ -5,6 +5,7 @@ using Domain.Entities;
 using FluentAssertions;
 
 namespace Application.UnitTests.Features.Todos;
+
 public sealed class DeleteTodoCommandHandlerTests
 {
     [Fact]

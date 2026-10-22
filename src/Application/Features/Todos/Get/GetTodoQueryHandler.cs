@@ -4,13 +4,16 @@ using Application.Abstractions.Messaging;
 using Domain.Common;
 
 namespace Application.Features.Todos.Get;
+
 public sealed class GetTodoQueryHandler(IAppDbContext dbContext) : IQueryHandler<GetTodoQuery, TodoDetailResponse>
 {
     public async Task<Result<TodoDetailResponse>> Handle(GetTodoQuery query, CancellationToken cancellationToken = default)
     {
         var todo = await dbContext.Todos.FindAsync([query.Id], cancellationToken);
         if (todo is null)
+        {
             return Result.Failure<TodoDetailResponse>(Error.NotFound("Todo.NotFound", $"Todo with ID '{query.Id}' was not found."));
+        }
 
         var response = new TodoDetailResponse(todo.Id, todo.Title, todo.Description, todo.IsCompleted, todo.CompletedAt, todo.CreatedAt);
         return Result.Success(response);
