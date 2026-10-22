@@ -3,9 +3,9 @@ using Api.Extensions;
 using Application;
 using Infrastructure;
 using Infrastructure.Persistence;
-using ServiceDefaults;
 using Scalar.AspNetCore;
 using Serilog;
+using ServiceDefaults;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -23,7 +23,7 @@ try
         loggerConfiguration.ReadFrom.Configuration(context.Configuration));
 
     // Aspire-managed PostgreSQL
-    builder.AddNpgsqlDbContext<AppDbContext>("db"); 
+    builder.AddNpgsqlDbContext<AppDbContext>("db");
 
     // Aspire-managed Redis (for HybridCache L2)
     builder.AddRedisDistributedCache("cache");
@@ -68,6 +68,12 @@ try
         });
     });
 
+    //builder.Services.AddCors(o => o.AddDefaultPolicy(p => p
+    //    .WithOrigins(builder.Configuration["Cors:Origin"] ?? "http://localhost:5173")
+    //    .AllowAnyHeader()
+    //    .AllowAnyMethod()));
+
+
     // ProblemDetails
     builder.Services.AddProblemDetails();
 
@@ -75,6 +81,7 @@ try
 
     // Global exception handler
     app.UseExceptionHandler();
+    app.UseCors();
     app.UseStatusCodePages();
 
     if (app.Environment.IsDevelopment())
