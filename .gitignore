@@ -66,3 +66,16 @@ docker-compose.override.yml
 TestResults/
 coverage/
 *.trx
+
+## Claude Code local files
+**/CLAUDE.md
+**/CLAUDE.local.md
+**/CLAUDE.TODO.txt
+**/.claude/
+.mcp.json
+**/.mcp.json
+.worktreeinclude
+**/.worktreeinclude
+**/claude.local.*
+**/.claude-*
+**/claude-*.local.*
