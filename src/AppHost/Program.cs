@@ -5,6 +5,7 @@ var postgres = builder.AddPostgres("postgres")
         .WithContainerName("aspire-pgadmin")
         .WithLifetime(ContainerLifetime.Persistent))
     .WithContainerName("aspire-postgres")
+    .WithImageTag("18")
     .WithLifetime(ContainerLifetime.Persistent);
 
 var database = postgres.AddDatabase("db");
