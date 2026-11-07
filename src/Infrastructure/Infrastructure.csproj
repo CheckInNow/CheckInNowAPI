@@ -12,6 +12,8 @@
     <PackageReference Include="Serilog.AspNetCore" />
     <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" />
     <PackageReference Include="Aspire.StackExchange.Redis" />
+    <PackageReference Include="MailKit" />
+    <PackageReference Include="RestSharp" />
   </ItemGroup>
 </Project>
 
