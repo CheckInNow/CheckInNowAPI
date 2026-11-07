@@ -72,7 +72,7 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<ICurrentUser, CurrentUser>();
-        services.AddScoped<IGoogleTokenValidator, GoogleTokenValidator>();
+        services.AddScoped<IGoogleTokenVerifier, IGoogleTokenVerifier>();
     }
 
     private static void AddCachingServices(this IServiceCollection services)

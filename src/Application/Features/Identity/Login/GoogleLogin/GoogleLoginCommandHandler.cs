@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Identity;
 namespace Application.Features.Identity.Login.GoogleLogin;
 
 public sealed class GoogleLoginCommandHandler(
-    IGoogleTokenValidator google,
+    IGoogleTokenVerifier google,
     UserManager<ApplicationUser> userManager,
     ITokenService tokens) : IRequestHandler<GoogleLoginCommand, Result<TokenResponse>>
 {

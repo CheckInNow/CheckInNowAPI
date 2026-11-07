@@ -1,11 +1,10 @@
 using Application.Abstractions.OAuth;
-using Application.Features.Identity.Login.GoogleLogin;
 using Google.Apis.Auth;
 using Microsoft.Extensions.Configuration;
 
 namespace Infrastructure.OAuth;
 
-public sealed class GoogleTokenValidator(IConfiguration config) : IGoogleTokenValidator
+public sealed class IGoogleTokenVerifier(IConfiguration config) : Application.Abstractions.OAuth.IGoogleTokenVerifier
 {
     public async Task<GoogleUserInfo?> ValidateAsync(string idToken, CancellationToken ct)
     {
