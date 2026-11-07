@@ -27,7 +27,7 @@ public sealed class EmailRegistrationTests
         services.AddSingleton<IConfiguration>(configuration);
         services.AddLogging();
         services.AddInfrastructure(configuration);
-        
+
         services.RemoveAll<IGoogleTokenVerifier>();
 
         return services.BuildServiceProvider();
