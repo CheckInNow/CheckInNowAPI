@@ -22,9 +22,18 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - Jwt__Secret=${Jwt__Secret}
       - Authentication__Google__ClientId=${Authentication__Google__ClientId}
+      - EMAIL_PROVIDER=${EMAIL_PROVIDER:-mailpit}
+      - MAILGUN_API_KEY=${MAILGUN_API_KEY}
+      - MAILGUN_DOMAIN=${MAILGUN_DOMAIN}
+      - MAILGUN_FROM=${MAILGUN_FROM}
+      - MAILPIT_HOST=mailpit
+      - MAILPIT_SMTP_PORT=1025
+      - Frontend__Url=${Frontend__Url}
     depends_on:
       postgres:
         condition: service_healthy
+      mailpit:
+        condition: service_started
     networks:
       - dev
 
@@ -81,6 +90,15 @@ services:
       start_period: 5s
     ports:
       - "${REDIS_PORT:-6379}:6379"
+    networks:
+      - dev
+    restart: unless-stopped
+
+  mailpit:
+    image: axllent/mailpit:v1.33.0
+    hostname: mailpit
+    ports:
+      - "${MAILPIT_PORT:-8025}:8025"
     networks:
       - dev
     restart: unless-stopped

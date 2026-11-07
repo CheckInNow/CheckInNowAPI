@@ -1,12 +1,16 @@
 
 using System.Text;
 using Application.Abstractions.Data;
+using Application.Abstractions.Email;
 using Application.Abstractions.Identity;
 using Application.Abstractions.OAuth;
+using Application.Abstractions.Shared;
 using Domain.Entities;
+using Infrastructure.Email;
 using Infrastructure.Identity;
 using Infrastructure.OAuth;
 using Infrastructure.Persistence;
+using Infrastructure.Shared;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -22,6 +26,7 @@ public static class DependencyInjection
         services.AddPersistence();
         services.AddAuth(configuration);
         services.AddCachingServices();
+        services.AddEmail(configuration);
 
         return services;
     }
@@ -85,5 +90,19 @@ public static class DependencyInjection
                 LocalCacheExpiration = TimeSpan.FromMinutes(2)
             };
         });
+    }
+
+    private static void AddEmail(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddScoped<IFrontendLinkBuilder, FrontendLinkBuilder>();
+
+        if (string.Equals(configuration["EMAIL_PROVIDER"], "mailgun", StringComparison.OrdinalIgnoreCase))
+        {
+            services.AddHttpClient<IEmailSender, MailgunEmailSender>();
+        }
+        else
+        {
+            services.AddScoped<IEmailSender, MailpitEmailSender>();
+        }
     }
 }
