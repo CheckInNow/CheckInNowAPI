@@ -21,6 +21,7 @@ services:
       - ASPNETCORE_HTTP_PORTS=8080
       - ASPNETCORE_ENVIRONMENT=Development
       - Jwt__Secret=${Jwt__Secret}
+      - Authentication__Google__ClientId=${Authentication__Google__ClientId}
     depends_on:
       postgres:
         condition: service_healthy

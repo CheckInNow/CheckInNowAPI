@@ -68,10 +68,10 @@ try
         });
     });
 
-    //builder.Services.AddCors(o => o.AddDefaultPolicy(p => p
-    //    .WithOrigins(builder.Configuration["Cors:Origin"] ?? "http://localhost:5173")
-    //    .AllowAnyHeader()
-    //    .AllowAnyMethod()));
+    builder.Services.AddCors(o => o.AddDefaultPolicy(p => p
+        .WithOrigins(builder.Configuration["Cors:Origin"] ?? "http://localhost:5173")
+        .AllowAnyHeader()
+        .AllowAnyMethod()));
 
 
     // ProblemDetails

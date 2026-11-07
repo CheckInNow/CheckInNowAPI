@@ -11,6 +11,7 @@ publish/
 *.userosscache
 *.sln.docstates
 *.DotSettings.user
+.env
 
 ## NuGet
 **/packages/
@@ -79,3 +80,4 @@ coverage/
 **/claude.local.*
 **/.claude-*
 **/claude-*.local.*
+/.env
