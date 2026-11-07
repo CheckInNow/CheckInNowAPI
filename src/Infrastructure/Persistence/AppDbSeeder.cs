@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Persistence;
+
 public static class AppDbSeeder
 {
     public static async Task SeedAsync(IServiceProvider serviceProvider)
@@ -42,7 +43,9 @@ public static class AppDbSeeder
         const string adminEmail = "admin@example.dev";
 
         if (await userManager.FindByEmailAsync(adminEmail) is not null)
+        {
             return;
+        }
 
         var admin = new ApplicationUser
         {
@@ -65,7 +68,9 @@ public static class AppDbSeeder
     private static async Task SeedSampleTodosAsync(AppDbContext context, ILogger logger)
     {
         if (await context.Todos.AnyAsync())
+        {
             return;
+        }
 
         var todos = new List<TodoItem>
         {

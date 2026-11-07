@@ -2,12 +2,15 @@
 using Domain.Common;
 
 namespace Api.Extensions;
+
 public static class ResultExtensions
 {
     public static IResult ToProblemDetails(this Result result)
     {
         if (result.IsSuccess)
+        {
             throw new InvalidOperationException("Cannot convert a successful result to a problem.");
+        }
 
         var (statusCode, title) = result.Error!.Type switch
         {

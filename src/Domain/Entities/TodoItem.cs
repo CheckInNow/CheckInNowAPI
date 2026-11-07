@@ -2,6 +2,7 @@
 using Domain.Common;
 
 namespace Domain.Entities;
+
 public sealed class TodoItem : AuditableEntity
 {
     public string Title { get; set; } = default!;
@@ -11,7 +12,11 @@ public sealed class TodoItem : AuditableEntity
 
     public void MarkAsCompleted()
     {
-        if (IsCompleted) return;
+        if (IsCompleted)
+        {
+            return;
+        }
+
         IsCompleted = true;
         CompletedAt = DateTimeOffset.UtcNow;
     }

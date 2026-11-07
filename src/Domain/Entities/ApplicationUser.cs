@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 
 namespace Domain.Entities;
+
 public sealed class ApplicationUser : IdentityUser<Guid>
 {
     public string FirstName { get; set; } = default!;

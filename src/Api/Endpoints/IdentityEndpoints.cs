@@ -1,11 +1,13 @@
 using Api.Extensions;
 using Application.Features.Identity.Login;
+using Application.Features.Identity.Login.GoogleLogin;
 using Application.Features.Identity.RefreshToken;
 using Application.Features.Identity.Register;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Endpoints;
+
 public static class IdentityEndpoints
 {
     public static void MapIdentityEndpoints(this IEndpointRouteBuilder app)
@@ -20,6 +22,10 @@ public static class IdentityEndpoints
         group.MapPost("/login", Login)
             .WithName("Login")
             .WithSummary("Login with email and password");
+
+        group.MapPost("/google", LoginGoogle)
+            .WithName("LoginGoogle")
+            .WithSummary("Login with Google");
 
         group.MapPost("/refresh", Refresh)
             .WithName("RefreshToken")
@@ -37,6 +43,15 @@ public static class IdentityEndpoints
 
     private static async Task<IResult> Login(
         [FromBody] LoginCommand command,
+        [FromServices] ISender sender,
+        CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(command, cancellationToken);
+        return result.IsSuccess ? TypedResults.Ok(result.Value) : result.ToProblemDetails();
+    }
+
+    private static async Task<IResult> LoginGoogle(
+        [FromBody] GoogleLoginCommand command,
         [FromServices] ISender sender,
         CancellationToken cancellationToken)
     {

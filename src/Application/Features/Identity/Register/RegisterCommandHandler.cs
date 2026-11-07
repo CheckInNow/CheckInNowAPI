@@ -5,13 +5,16 @@ using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace Application.Features.Identity.Register;
+
 public sealed class RegisterCommandHandler(UserManager<ApplicationUser> userManager) : ICommandHandler<RegisterCommand>
 {
     public async Task<Result> Handle(RegisterCommand command, CancellationToken cancellationToken = default)
     {
         var existingUser = await userManager.FindByEmailAsync(command.Email);
         if (existingUser is not null)
+        {
             return Result.Failure(Error.Conflict("Auth.EmailTaken", "A user with this email already exists."));
+        }
 
         var user = new ApplicationUser
         {

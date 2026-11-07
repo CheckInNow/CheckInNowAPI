@@ -2,6 +2,7 @@
 using Domain.Entities;
 
 namespace Application.Abstractions.Identity;
+
 public interface ITokenService
 {
     Task<TokenResponse> GenerateTokenAsync(ApplicationUser user, CancellationToken cancellationToken = default);

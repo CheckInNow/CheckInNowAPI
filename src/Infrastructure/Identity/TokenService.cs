@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Infrastructure.Identity;
+
 public sealed class TokenService(
     UserManager<ApplicationUser> userManager,
     IConfiguration configuration) : ITokenService
@@ -58,7 +59,9 @@ public sealed class TokenService(
                    ?? throw new InvalidOperationException("User not found.");
 
         if (user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTimeOffset.UtcNow)
+        {
             throw new InvalidOperationException("Invalid or expired refresh token.");
+        }
 
         return await GenerateTokenAsync(user, cancellationToken);
     }
@@ -81,7 +84,9 @@ public sealed class TokenService(
 
         if (securityToken is not JwtSecurityToken jwtSecurityToken ||
             !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+        {
             throw new InvalidOperationException("Invalid token.");
+        }
 
         return principal;
     }

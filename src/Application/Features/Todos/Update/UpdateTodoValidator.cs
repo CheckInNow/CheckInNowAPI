@@ -2,6 +2,7 @@
 using FluentValidation;
 
 namespace Application.Features.Todos.Update;
+
 public sealed class UpdateTodoValidator : AbstractValidator<UpdateTodoCommand>
 {
     public UpdateTodoValidator()
