@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace Infrastructure.OAuth;
 
-public sealed class IGoogleTokenVerifier(IConfiguration config) : Application.Abstractions.OAuth.IGoogleTokenVerifier
+public sealed class GoogleTokenVerifier(IConfiguration config) : IGoogleTokenVerifier
 {
     public async Task<GoogleUserInfo?> ValidateAsync(string idToken, CancellationToken ct)
     {
