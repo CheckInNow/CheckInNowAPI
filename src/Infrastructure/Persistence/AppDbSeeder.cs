@@ -1,5 +1,5 @@
-
 using Domain.Entities;
+using Domain.Constants;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,8 +26,7 @@ public static class AppDbSeeder
 
     private static async Task SeedRolesAsync(RoleManager<IdentityRole<Guid>> roleManager, ILogger logger)
     {
-        string[] roles = ["Admin", "User"];
-
+        List<string> roles = new([Roles.Admin, Roles.User, Roles.Organizer]);
         foreach (var role in roles)
         {
             if (!await roleManager.RoleExistsAsync(role))
@@ -60,7 +59,7 @@ public static class AppDbSeeder
 
         if (result.Succeeded)
         {
-            await userManager.AddToRoleAsync(admin, "Admin");
+            await userManager.AddToRoleAsync(admin, Roles.Admin);
             logger.LogInformation("Seeded admin user: {Email}", adminEmail);
         }
     }
