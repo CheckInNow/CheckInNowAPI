@@ -2,6 +2,7 @@
 using Application.Abstractions.Identity;
 using Application.Abstractions.OAuth;
 using Application.Features.Identity.Login.GoogleLogin;
+using Domain.Constants;
 using Domain.Entities;
 using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
@@ -31,6 +32,7 @@ public sealed class GoogleLoginCommandHandlerTests
         _userManager.FindByEmailAsync(Arg.Any<string>()).ReturnsNull();
         _userManager.CreateAsync(Arg.Any<ApplicationUser>()).Returns(IdentityResult.Success);
         _userManager.AddLoginAsync(Arg.Any<ApplicationUser>(), Arg.Any<UserLoginInfo>()).Returns(IdentityResult.Success);
+        _userManager.AddToRoleAsync(Arg.Any<ApplicationUser>(), Arg.Any<string>()).Returns(IdentityResult.Success);
         _userManager.IsLockedOutAsync(Arg.Any<ApplicationUser>()).Returns(false);
         _tokens.GenerateTokenAsync(Arg.Any<ApplicationUser>(), Arg.Any<CancellationToken>()).Returns(Token);
     }
@@ -116,7 +118,7 @@ public sealed class GoogleLoginCommandHandlerTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error!.Code.Should().Be("Account.EmailNotConfirmed");
+        result.Error!.Code.Should().Be("Auth.EmailNotConfirmed");
         await _userManager.DidNotReceive().AddLoginAsync(Arg.Any<ApplicationUser>(), Arg.Any<UserLoginInfo>());
         await _tokens.DidNotReceive().GenerateTokenAsync(Arg.Any<ApplicationUser>(), Arg.Any<CancellationToken>());
     }
@@ -154,7 +156,7 @@ public sealed class GoogleLoginCommandHandlerTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error!.Code.Should().Be("Account.LockedOut");
+        result.Error!.Code.Should().Be("Auth.LockedOut");
         await _tokens.DidNotReceive().GenerateTokenAsync(Arg.Any<ApplicationUser>(), Arg.Any<CancellationToken>());
     }
 
@@ -171,7 +173,7 @@ public sealed class GoogleLoginCommandHandlerTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error!.Code.Should().Be("Account.CreateFailed");
+        result.Error!.Code.Should().Be("Auth.CreateFailed");
         await _userManager.DidNotReceive().AddLoginAsync(Arg.Any<ApplicationUser>(), Arg.Any<UserLoginInfo>());
     }
 
@@ -188,9 +190,76 @@ public sealed class GoogleLoginCommandHandlerTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error!.Code.Should().Be("Account.AddLoginFailed");
+        result.Error!.Code.Should().Be("Auth.AddLoginFailed");
         await _userManager.Received(1).DeleteAsync(Arg.Any<ApplicationUser>());
         await _tokens.DidNotReceive().GenerateTokenAsync(Arg.Any<ApplicationUser>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task Handle_Should_Assign_User_Role_When_User_Is_New()
+    {
+        // Arrange
+        SetupGoogleTokenAsValid();
+
+        // Act
+        var result = await _handler.Handle(new GoogleLoginCommand(IdToken), TestContext.Current.CancellationToken);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        await _userManager.Received(1).AddToRoleAsync(Arg.Any<ApplicationUser>(), Roles.User);
+        await _userManager.DidNotReceive().AddToRoleAsync(Arg.Any<ApplicationUser>(), Roles.Organizer);
+        await _userManager.DidNotReceive().AddToRoleAsync(Arg.Any<ApplicationUser>(), Roles.Admin);
+    }
+
+    [Fact]
+    public async Task Handle_Should_Delete_New_User_When_Role_Assignment_Fails()
+    {
+        // Arrange
+        SetupGoogleTokenAsValid();
+        _userManager.AddToRoleAsync(Arg.Any<ApplicationUser>(), Roles.User)
+            .Returns(IdentityResult.Failed(new IdentityError { Code = "Error", Description = "Error" }));
+
+        // Act
+        var result = await _handler.Handle(new GoogleLoginCommand(IdToken), TestContext.Current.CancellationToken);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error!.Code.Should().Be("Auth.RoleAssignmentFailed");
+        await _userManager.Received(1).DeleteAsync(Arg.Any<ApplicationUser>());
+        await _userManager.DidNotReceive().AddLoginAsync(Arg.Any<ApplicationUser>(), Arg.Any<UserLoginInfo>());
+        await _tokens.DidNotReceive().GenerateTokenAsync(Arg.Any<ApplicationUser>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task Handle_Should_Not_Assign_Role_When_Linking_Existing_User()
+    {
+        // Arrange
+        SetupGoogleTokenAsValid();
+        var existing = new ApplicationUser { Email = Email, UserName = Email, EmailConfirmed = true, FirstName = "Jan", LastName = "Kowalski" };
+        _userManager.FindByEmailAsync(Email).Returns(existing);
+
+        // Act
+        var result = await _handler.Handle(new GoogleLoginCommand(IdToken), TestContext.Current.CancellationToken);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        await _userManager.DidNotReceive().AddToRoleAsync(Arg.Any<ApplicationUser>(), Arg.Any<string>());
+    }
+
+    [Fact]
+    public async Task Handle_Should_Not_Assign_Role_When_Google_Login_Already_Exists()
+    {
+        // Arrange
+        SetupGoogleTokenAsValid();
+        var linked = new ApplicationUser { Email = Email, UserName = Email, EmailConfirmed = true, FirstName = "Jan", LastName = "Kowalski" };
+        _userManager.FindByLoginAsync("Google", Subject).Returns(linked);
+
+        // Act
+        var result = await _handler.Handle(new GoogleLoginCommand(IdToken), TestContext.Current.CancellationToken);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        await _userManager.DidNotReceive().AddToRoleAsync(Arg.Any<ApplicationUser>(), Arg.Any<string>());
     }
 
     private void SetupGoogleTokenAsValid(bool emailVerified = true)
