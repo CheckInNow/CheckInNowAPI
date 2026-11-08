@@ -21,7 +21,8 @@ public static class TodoEndpoints
 
         group.MapGet("/", GetAll)
             .WithName("GetAllTodos")
-            .WithSummary("Get all todos with pagination");
+            .WithSummary("Get all todos with pagination")
+            .RequireAuthorization("Admin");
 
         group.MapGet("/{id:guid}", GetById)
             .WithName("GetTodoById")

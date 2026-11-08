@@ -5,6 +5,7 @@ using Application.Abstractions.Email;
 using Application.Abstractions.Identity;
 using Application.Abstractions.OAuth;
 using Application.Abstractions.Shared;
+using Domain.Constants;
 using Domain.Entities;
 using Infrastructure.Email;
 using Infrastructure.Identity;
@@ -73,7 +74,9 @@ public static class DependencyInjection
                 };
             });
 
-        services.AddAuthorization();
+        services.AddAuthorizationBuilder()
+            .AddPolicy("Organizer", p => p.RequireRole(Roles.Organizer))
+            .AddPolicy("Admin", p => p.RequireRole(Roles.Admin));
         services.AddHttpContextAccessor();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<ICurrentUser, CurrentUser>();

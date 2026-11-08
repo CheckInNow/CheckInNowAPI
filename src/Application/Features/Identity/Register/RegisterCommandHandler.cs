@@ -1,6 +1,7 @@
 
 using Application.Abstractions.Messaging;
 using Domain.Common;
+using Domain.Constants;
 using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 
@@ -29,6 +30,13 @@ public sealed class RegisterCommandHandler(UserManager<ApplicationUser> userMana
         {
             var errors = string.Join(", ", result.Errors.Select(e => e.Description));
             return Result.Failure(Error.Validation("Auth.RegistrationFailed", errors));
+        }
+
+        var roleResult = await userManager.AddToRoleAsync(user, Roles.User);
+        if (!roleResult.Succeeded)
+        {
+            await userManager.DeleteAsync(user);
+            return Result.Failure(Error.Failure("Auth.RoleAssignmentFailed", "Failed to assign role."));
         }
 
         return Result.Success();

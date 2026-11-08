@@ -1,6 +1,7 @@
 using Application.Abstractions.Identity;
 using Application.Abstractions.OAuth;
 using Domain.Common;
+using Domain.Constants;
 using Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -37,13 +38,13 @@ public sealed class GoogleLoginCommandHandler(
             {
                 if (!user.EmailConfirmed)
                 {
-                    return Result.Failure<TokenResponse>(Error.Failure("Account.EmailNotConfirmed", "Account email is not confirmed"));
+                    return Result.Failure<TokenResponse>(Error.Failure("Auth.EmailNotConfirmed", "Account email is not confirmed"));
                 }
 
                 var link = await userManager.AddLoginAsync(user, new UserLoginInfo(Provider, info.Subject, Provider));
                 if (!link.Succeeded)
                 {
-                    return Result.Failure<TokenResponse>(Error.Failure("Account.AddLoginFailed", "Failed to add Google login to account"));
+                    return Result.Failure<TokenResponse>(Error.Failure("Auth.AddLoginFailed", "Failed to add Google login to account"));
                 }
             }
         }
@@ -62,20 +63,27 @@ public sealed class GoogleLoginCommandHandler(
             var create = await userManager.CreateAsync(user);
             if (!create.Succeeded)
             {
-                return Result.Failure<TokenResponse>(Error.Failure("Account.CreateFailed", "Failed to create new user"));
+                return Result.Failure<TokenResponse>(Error.Failure("Auth.CreateFailed", "Failed to create new user"));
+            }
+
+            var roleResult = await userManager.AddToRoleAsync(user, Roles.User);
+            if (!roleResult.Succeeded)
+            {
+                await userManager.DeleteAsync(user);
+                return Result.Failure<TokenResponse>(Error.Failure("Auth.RoleAssignmentFailed", "Failed to assign role."));
             }
 
             var link = await userManager.AddLoginAsync(user, new UserLoginInfo(Provider, info.Subject, Provider));
             if (!link.Succeeded)
             {
                 await userManager.DeleteAsync(user);
-                return Result.Failure<TokenResponse>(Error.Failure("Account.AddLoginFailed", "Failed to add Google login to account"));
+                return Result.Failure<TokenResponse>(Error.Failure("Auth.AddLoginFailed", "Failed to add Google login to account"));
             }
         }
 
         if (await userManager.IsLockedOutAsync(user))
         {
-            return Result.Failure<TokenResponse>(Error.Failure("Account.LockedOut", "Account is locked out"));
+            return Result.Failure<TokenResponse>(Error.Failure("Auth.LockedOut", "Account is locked out"));
         }
 
         var response = await tokens.GenerateTokenAsync(user, ct);
