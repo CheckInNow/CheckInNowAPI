@@ -10,7 +10,7 @@ namespace Infrastructure.Persistence;
 
 public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>(options), IAppDbContext
 {
-    public DbSet<TodoItem> Todos => Set<TodoItem>();
+    public DbSet<Conference> Conferences => Set<Conference>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
