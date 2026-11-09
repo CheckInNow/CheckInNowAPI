@@ -28,7 +28,7 @@ services:
       - MAILGUN_FROM=${MAILGUN_FROM}
       - MAILPIT_HOST=mailpit
       - MAILPIT_SMTP_PORT=1025
-      - Frontend__Url=${Frontend__Url}
+      - Cors__Origin=${Cors__Origin}
     depends_on:
       postgres:
         condition: service_healthy

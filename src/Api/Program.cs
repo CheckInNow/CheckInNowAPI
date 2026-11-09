@@ -5,6 +5,7 @@ using Infrastructure;
 using Infrastructure.Persistence;
 using Scalar.AspNetCore;
 using Serilog;
+using System.Threading.RateLimiting;
 using ServiceDefaults;
 
 Log.Logger = new LoggerConfiguration()
@@ -69,10 +70,25 @@ try
     });
 
     builder.Services.AddCors(o => o.AddDefaultPolicy(p => p
-        .WithOrigins(builder.Configuration["Frontend:Url"] ?? "http://localhost:5173")
+        .WithOrigins(builder.Configuration["Cors:Origin"] ?? "http://localhost:5173")
         .AllowAnyHeader()
         .AllowAnyMethod()));
 
+
+    // Rate limiting
+    builder.Services.AddRateLimiter(options =>
+    {
+        options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+        options.AddPolicy(RateLimitPolicies.ResendVerification, httpContext =>
+            RateLimitPartition.GetFixedWindowLimiter(
+                httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 3,
+                    Window = TimeSpan.FromMinutes(15),
+                    QueueLimit = 0
+                }));
+    });
 
     // ProblemDetails
     builder.Services.AddProblemDetails();
@@ -96,6 +112,8 @@ try
 
     app.UseAuthentication();
     app.UseAuthorization();
+
+    app.UseRateLimiter();
 
     app.UseSerilogRequestLogging();
 

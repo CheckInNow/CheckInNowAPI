@@ -2,6 +2,7 @@
 using System.Reflection;
 using Application.Abstractions.Messaging;
 using Application.Behaviors;
+using Application.Features.Identity.EmailConfirmation;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,6 +23,8 @@ public static class DependencyInjection
         });
 
         services.AddValidatorsFromAssembly(assembly);
+
+        services.AddScoped<EmailConfirmationSender>();
 
         return services;
     }

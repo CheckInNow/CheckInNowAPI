@@ -9,7 +9,7 @@ public sealed class FrontendLinkBuilderTests
     private static FrontendLinkBuilder CreateBuilder(string? frontendUrl)
     {
         var configuration = new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string?> { ["Frontend:Url"] = frontendUrl })
+            .AddInMemoryCollection(new Dictionary<string, string?> { ["Cors:Origin"] = frontendUrl })
             .Build();
 
         return new FrontendLinkBuilder(configuration);
