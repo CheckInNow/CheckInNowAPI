@@ -2,6 +2,7 @@ using Application.Features.Identity.Register;
 using Domain.Constants;
 using Domain.Entities;
 using FluentAssertions;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using NSubstitute;
 using NSubstitute.ReturnsExtensions;
@@ -14,11 +15,12 @@ public sealed class RegisterCommandHandlerTests
         new("Jan", "Kowalski", "jan@example.com", "Password1!", "Password1!");
 
     private readonly UserManager<ApplicationUser> _userManager = CreateUserManager();
+    private readonly IPublisher _publisher = Substitute.For<IPublisher>();
     private readonly RegisterCommandHandler _handler;
 
     public RegisterCommandHandlerTests()
     {
-        _handler = new RegisterCommandHandler(_userManager);
+        _handler = new RegisterCommandHandler(_userManager, _publisher);
 
         _userManager.FindByEmailAsync(Arg.Any<string>()).ReturnsNull();
         _userManager.CreateAsync(Arg.Any<ApplicationUser>(), Arg.Any<string>()).Returns(IdentityResult.Success);
@@ -85,6 +87,50 @@ public sealed class RegisterCommandHandlerTests
         result.IsFailure.Should().BeTrue();
         result.Error!.Code.Should().Be("Auth.RegistrationFailed");
         await _userManager.DidNotReceive().AddToRoleAsync(Arg.Any<ApplicationUser>(), Arg.Any<string>());
+    }
+
+    [Fact]
+    public async Task Handle_Should_Publish_UserRegistered_When_Registration_Succeeds()
+    {
+        // Arrange
+        var userId = Guid.Empty;
+        await _userManager.CreateAsync(Arg.Do<ApplicationUser>(u => userId = u.Id), Arg.Any<string>());
+
+        // Act
+        var result = await _handler.Handle(Command, TestContext.Current.CancellationToken);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        await _publisher.Received(1).Publish(
+            Arg.Is<UserRegistered>(e => e.UserId == userId),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task Handle_Should_Not_Publish_UserRegistered_When_Email_Is_Taken()
+    {
+        // Arrange
+        _userManager.FindByEmailAsync(Command.Email).Returns(new ApplicationUser { Email = Command.Email });
+
+        // Act
+        await _handler.Handle(Command, TestContext.Current.CancellationToken);
+
+        // Assert
+        await _publisher.DidNotReceive().Publish(Arg.Any<UserRegistered>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task Handle_Should_Not_Publish_UserRegistered_When_Role_Assignment_Fails()
+    {
+        // Arrange
+        _userManager.AddToRoleAsync(Arg.Any<ApplicationUser>(), Roles.User)
+            .Returns(IdentityResult.Failed(new IdentityError { Code = "Error", Description = "Error" }));
+
+        // Act
+        await _handler.Handle(Command, TestContext.Current.CancellationToken);
+
+        // Assert
+        await _publisher.DidNotReceive().Publish(Arg.Any<UserRegistered>(), Arg.Any<CancellationToken>());
     }
 
     private static UserManager<ApplicationUser> CreateUserManager()

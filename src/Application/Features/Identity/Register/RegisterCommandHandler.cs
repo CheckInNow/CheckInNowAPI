@@ -3,11 +3,14 @@ using Application.Abstractions.Messaging;
 using Domain.Common;
 using Domain.Constants;
 using Domain.Entities;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 
 namespace Application.Features.Identity.Register;
 
-public sealed class RegisterCommandHandler(UserManager<ApplicationUser> userManager) : ICommandHandler<RegisterCommand>
+public sealed class RegisterCommandHandler(
+    UserManager<ApplicationUser> userManager,
+    IPublisher publisher) : ICommandHandler<RegisterCommand>
 {
     public async Task<Result> Handle(RegisterCommand command, CancellationToken cancellationToken = default)
     {
@@ -38,6 +41,8 @@ public sealed class RegisterCommandHandler(UserManager<ApplicationUser> userMana
             await userManager.DeleteAsync(user);
             return Result.Failure(Error.Failure("Auth.RoleAssignmentFailed", "Failed to assign role."));
         }
+
+        await publisher.Publish(new UserRegistered(user.Id), cancellationToken);
 
         return Result.Success();
     }

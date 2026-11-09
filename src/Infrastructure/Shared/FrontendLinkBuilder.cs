@@ -7,8 +7,8 @@ public sealed class FrontendLinkBuilder(IConfiguration configuration) : IFronten
 {
     public string BuildFrontendLink(string action, Guid userId, string token)
     {
-        var frontendUrl = configuration["Frontend:Url"]?.TrimEnd('/')
-            ?? throw new InvalidOperationException("Frontend:Url is not configured");
+        var frontendUrl = configuration["Cors:Origin"]?.TrimEnd('/')
+            ?? throw new InvalidOperationException("Cors:Origin is not configured");
 
         // /confirm-email, /reset-password etc
         return $"{frontendUrl}/{action}?userId={userId}&token={token}";

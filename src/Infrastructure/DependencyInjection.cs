@@ -7,6 +7,7 @@ using Application.Abstractions.OAuth;
 using Application.Abstractions.Shared;
 using Domain.Constants;
 using Domain.Entities;
+using Infrastructure.BackgroundServices;
 using Infrastructure.Email;
 using Infrastructure.Identity;
 using Infrastructure.OAuth;
@@ -16,6 +17,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Infrastructure;
@@ -47,10 +49,12 @@ public static class DependencyInjection
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequiredLength = 6;
                 options.User.RequireUniqueEmail = true;
+                options.Tokens.EmailConfirmationTokenProvider = EmailConfirmationTokenProviderOptions.ProviderName;
             })
             .AddRoles<IdentityRole<Guid>>()
             .AddEntityFrameworkStores<AppDbContext>()
-            .AddDefaultTokenProviders();
+            .AddDefaultTokenProviders()
+            .AddTokenProvider<EmailConfirmationTokenProvider<ApplicationUser>>(EmailConfirmationTokenProviderOptions.ProviderName);
 
         services.AddAuthentication(options =>
             {
@@ -81,6 +85,9 @@ public static class DependencyInjection
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<ICurrentUser, CurrentUser>();
         services.AddScoped<IGoogleTokenVerifier, GoogleTokenVerifier>();
+
+        services.TryAddSingleton(TimeProvider.System);
+        services.AddHostedService<UnconfirmedUserCleanupService>();
     }
 
     private static void AddCachingServices(this IServiceCollection services)
