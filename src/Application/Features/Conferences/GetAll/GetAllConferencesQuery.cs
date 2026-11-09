@@ -1,6 +1,5 @@
 
 using Application.Abstractions.Messaging;
-using Application.Features.Todos.Get;
 using Domain.Common;
 
 namespace Application.Features.Conferences.GetAll;

@@ -119,7 +119,6 @@ try
 
     // Map endpoints
     app.MapIdentityEndpoints();
-    app.MapTodoEndpoints();
     app.MapConferenceEndpoints();
 
     // Aspire default endpoints (health, alive)

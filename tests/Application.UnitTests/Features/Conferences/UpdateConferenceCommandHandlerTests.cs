@@ -3,6 +3,7 @@ using Application.Features.Conferences.Update;
 using Domain.Common;
 using Domain.Entities;
 using FluentAssertions;
+using Infrastructure.Persistence;
 using NSubstitute;
 
 namespace Application.UnitTests.Features.Conferences;
@@ -129,7 +130,7 @@ public sealed class UpdateConferenceCommandHandlerTests
 
     private static UpdateConferenceCommand Command(Guid id) => new(id, null, null, null, null, null, null);
 
-    private static async Task<Conference> SeedConferenceAsync(Infrastructure.Persistence.AppDbContext dbContext)
+    private static async Task<Conference> SeedConferenceAsync(AppDbContext dbContext)
     {
         var conference = new Conference
         {
