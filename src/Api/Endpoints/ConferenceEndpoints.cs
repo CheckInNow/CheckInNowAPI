@@ -1,6 +1,7 @@
 using Api.Extensions;
 using Api.Requests.Conferences;
 using Application.Features.Conferences.Create;
+using Application.Features.Conferences.Delete;
 using Application.Features.Conferences.Get;
 using Application.Features.Conferences.GetAll;
 using Application.Features.Conferences.Update;
@@ -36,6 +37,11 @@ public static class ConferenceEndpoints
             .WithName("UpdateConference")
             .WithSummary("Partially update a conference. Only the owner can do this.")
             .RequireAuthorization("Organizer");
+
+        group.MapDelete("/{id:guid}", DeleteConference)
+            .WithName("DeleteConference")
+            .WithSummary("Delete (soft) a conference. Only the owner can do this.")
+            .RequireAuthorization("Organizer");
     }
 
     private static async Task<IResult> GetConferenceById(
@@ -70,6 +76,15 @@ public static class ConferenceEndpoints
             id, request.Name, request.Description, request.StartDate,
             request.EndDate, request.Location, request.ParticipantLimit);
         var result = await sender.Send(command, cancellationToken);
+        return result.IsSuccess ? TypedResults.NoContent() : result.ToProblemDetails();
+    }
+
+    private static async Task<IResult> DeleteConference(
+        [FromRoute] Guid id,
+        [FromServices] ISender sender,
+        CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(new DeleteConferenceCommand(id), cancellationToken);
         return result.IsSuccess ? TypedResults.NoContent() : result.ToProblemDetails();
     }
 
