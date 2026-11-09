@@ -10,7 +10,9 @@ public sealed class GetAllConferencesQueryHandler(IAppDbContext dbContext) : IQu
 {
     public async Task<Result<PagedResult<ConferenceListItemResponse>>> Handle(GetAllConferencesQuery query, CancellationToken cancellationToken = default)
     {
-        var totalCount = await dbContext.Conferences.CountAsync(cancellationToken);
+        var totalCount = await dbContext.Conferences
+            .Where(c => c.DeletedAt == null)
+            .CountAsync(cancellationToken);
 
         var items = await dbContext.Conferences
             .Where(c => c.DeletedAt == null)
