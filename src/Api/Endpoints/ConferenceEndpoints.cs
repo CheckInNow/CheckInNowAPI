@@ -1,6 +1,9 @@
 using Api.Extensions;
+using Api.Requests.Conferences;
+using Application.Features.Conferences.Create;
 using Application.Features.Conferences.Get;
 using Application.Features.Conferences.GetAll;
+using Application.Features.Conferences.Update;
 using Application.Features.Identity.Register;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +26,16 @@ public static class ConferenceEndpoints
             .WithName("GetConferenceById")
             .WithSummary("Get a conference by ID.")
             .AllowAnonymous();
+
+        group.MapPost("/", CreateConference)
+            .WithName("CreateConference")
+            .WithSummary("Create a conference. The current user becomes the owner.")
+            .RequireAuthorization("Organizer");
+
+        group.MapPatch("/{id:guid}", UpdateConference)
+            .WithName("UpdateConference")
+            .WithSummary("Partially update a conference. Only the owner can do this.")
+            .RequireAuthorization("Organizer");
     }
 
     private static async Task<IResult> GetConferenceById(
@@ -35,6 +48,30 @@ public static class ConferenceEndpoints
         return result.IsSuccess ? TypedResults.Ok() : result.ToProblemDetails();
     }
 
+
+    private static async Task<IResult> CreateConference(
+        [FromBody] CreateConferenceCommand command,
+        [FromServices] ISender sender,
+        CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(command, cancellationToken);
+        return result.IsSuccess
+            ? TypedResults.CreatedAtRoute(result.Value, "GetConferenceById", new { id = result.Value!.Id })
+            : result.ToProblemDetails();
+    }
+
+    private static async Task<IResult> UpdateConference(
+        [FromRoute] Guid id,
+        [FromBody] UpdateConferenceRequest request,
+        [FromServices] ISender sender,
+        CancellationToken cancellationToken)
+    {
+        var command = new UpdateConferenceCommand(
+            id, request.Name, request.Description, request.StartDate,
+            request.EndDate, request.Location, request.ParticipantLimit);
+        var result = await sender.Send(command, cancellationToken);
+        return result.IsSuccess ? TypedResults.NoContent() : result.ToProblemDetails();
+    }
 
     private static async Task<IResult> GetConferences(
         [AsParameters] GetAllConferencesQuery query,

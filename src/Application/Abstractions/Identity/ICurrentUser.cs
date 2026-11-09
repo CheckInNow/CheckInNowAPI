@@ -2,7 +2,7 @@ namespace Application.Abstractions.Identity;
 
 public interface ICurrentUser
 {
-    string? UserId { get; }
+    Guid? UserId { get; }
     string? Email { get; }
     bool IsAuthenticated { get; }
 }
