@@ -9,23 +9,20 @@ public sealed class GetRoomsQueryHandler(IAppDbContext dbContext) : IQueryHandle
 {
     public async Task<Result<List<RoomResponse>>> Handle(GetRoomsQuery query, CancellationToken cancellationToken = default)
     {
-        var data = await dbContext.Conferences
-            .Where(c => c.Id == query.ConferenceId && c.DeletedAt == null)
-            .Select(c => new
-            {
-                Rooms = c.Rooms
-                    .OrderBy(r => r.Name)
-                    .Select(r => new RoomResponse(r.Id, r.Name, r.Capacity))
-                    .ToList()
-            })
-            .FirstOrDefaultAsync(cancellationToken);
-
-        if (data is null)
+        var conferenceExists = await dbContext.Conferences
+            .AnyAsync(c => c.Id == query.ConferenceId && c.DeletedAt == null, cancellationToken);
+        if (!conferenceExists)
         {
             return Result.Failure<List<RoomResponse>>(
                 Error.NotFound("Conference.NotFound", $"Conference with ID '{query.ConferenceId}' was not found."));
         }
 
-        return Result.Success(data.Rooms);
+        var rooms = await dbContext.Rooms
+            .Where(r => r.ConferenceId == query.ConferenceId)
+            .OrderBy(r => r.Name)
+            .Select(r => new RoomResponse(r.Id, r.Name, r.Capacity))
+            .ToListAsync(cancellationToken);
+
+        return Result.Success(rooms);
     }
 }
