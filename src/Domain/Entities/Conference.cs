@@ -13,4 +13,6 @@ public sealed class Conference : AuditableEntity
     public Guid OrganizerId { get; set; }
     public ApplicationUser Organizer { get; set; } = default!;
     public DateTimeOffset? DeletedAt { get; set; } = null;
+    public ICollection<Room> Rooms { get; set; } = new List<Room>();
+    public ICollection<Speaker> Speakers { get; set; } = new List<Speaker>();
 }

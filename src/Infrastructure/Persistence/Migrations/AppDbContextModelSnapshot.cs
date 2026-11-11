@@ -162,6 +162,61 @@ namespace Infrastructure.Migrations
                     b.ToTable("Conferences");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Room", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("Capacity")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("ConferenceId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ConferenceId", "Name")
+                        .IsUnique();
+
+                    b.ToTable("Rooms");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Speaker", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Bio")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<Guid>("ConferenceId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ConferenceId");
+
+                    b.ToTable("Speakers");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
                 {
                     b.Property<Guid>("Id")
@@ -303,6 +358,28 @@ namespace Infrastructure.Migrations
                     b.Navigation("Organizer");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Room", b =>
+                {
+                    b.HasOne("Domain.Entities.Conference", "Conference")
+                        .WithMany("Rooms")
+                        .HasForeignKey("ConferenceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Conference");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Speaker", b =>
+                {
+                    b.HasOne("Domain.Entities.Conference", "Conference")
+                        .WithMany("Speakers")
+                        .HasForeignKey("ConferenceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Conference");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
@@ -357,6 +434,13 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.ApplicationUser", b =>
                 {
                     b.Navigation("Conferences");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Conference", b =>
+                {
+                    b.Navigation("Rooms");
+
+                    b.Navigation("Speakers");
                 });
 #pragma warning restore 612, 618
         }
