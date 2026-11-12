@@ -1,3 +1,4 @@
+using System.Threading.RateLimiting;
 using Api.Endpoints;
 using Api.Extensions;
 using Application;
@@ -5,7 +6,6 @@ using Infrastructure;
 using Infrastructure.Persistence;
 using Scalar.AspNetCore;
 using Serilog;
-using System.Threading.RateLimiting;
 using ServiceDefaults;
 
 Log.Logger = new LoggerConfiguration()
@@ -120,6 +120,8 @@ try
     // Map endpoints
     app.MapIdentityEndpoints();
     app.MapConferenceEndpoints();
+    app.MapRoomEndpoints();
+    app.MapSpeakerEndpoints();
 
     // Aspire default endpoints (health, alive)
     app.MapDefaultEndpoints();

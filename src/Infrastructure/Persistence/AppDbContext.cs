@@ -11,6 +11,8 @@ namespace Infrastructure.Persistence;
 public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>(options), IAppDbContext
 {
     public DbSet<Conference> Conferences => Set<Conference>();
+    public DbSet<Room> Rooms => Set<Room>();
+    public DbSet<Speaker> Speakers => Set<Speaker>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

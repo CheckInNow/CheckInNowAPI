@@ -1,5 +1,5 @@
-using Domain.Entities;
 using Domain.Constants;
+using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,6 +23,8 @@ public static class AppDbSeeder
         await SeedAdminUserAsync(userManager, logger);
         await SeedOrganizersAsync(userManager, logger);
         await SeedConferencesAsync(context, userManager, logger);
+        await SeedRoomsAsync(context, logger);
+        await SeedSpeakersAsync(context, logger);
     }
 
     private static async Task SeedRolesAsync(RoleManager<IdentityRole<Guid>> roleManager, ILogger logger)
@@ -188,5 +190,132 @@ public static class AppDbSeeder
         context.Conferences.AddRange(conferences);
         await context.SaveChangesAsync();
         logger.LogInformation("Seeded {Count} sample conferences", conferences.Count);
+    }
+
+    private static async Task SeedRoomsAsync(AppDbContext context, ILogger logger)
+    {
+        if (await context.Rooms.AnyAsync())
+        {
+            return;
+        }
+
+        var conferences = await GetSeededConferencesAsync(context);
+
+        var rooms = new List<Room>();
+        AddRooms(rooms, conferences, "CheckInNow Tech Summit",
+            ("Main Hall", 200), ("Workshop Room A", 40), ("Workshop Room B", 40));
+        AddRooms(rooms, conferences, "Frontend Day",
+            ("Main Stage", 80), ("Lab", 30));
+        AddRooms(rooms, conferences, "Women in Tech Meetup",
+            ("Online", null));
+        AddRooms(rooms, conferences, "Data & AI Conference",
+            ("Auditorium", 300), ("Room 1", null));
+        AddRooms(rooms, conferences, "Past Conference (finished)",
+            ("Aula", 100));
+        AddRooms(rooms, conferences, "Cancelled Conference (soft deleted)",
+            ("Room X", 50));
+
+        if (rooms.Count == 0)
+        {
+            return;
+        }
+
+        context.Rooms.AddRange(rooms);
+        await context.SaveChangesAsync();
+        logger.LogInformation("Seeded {Count} sample rooms", rooms.Count);
+    }
+
+    private static async Task SeedSpeakersAsync(AppDbContext context, ILogger logger)
+    {
+        if (await context.Speakers.AnyAsync())
+        {
+            return;
+        }
+
+        var conferences = await GetSeededConferencesAsync(context);
+
+        var speakers = new List<Speaker>();
+        AddSpeakers(speakers, conferences, "CheckInNow Tech Summit",
+            ("Anna", "Nowak", "Principal engineer, 10 years of building distributed systems in .NET."),
+            ("Piotr", "Wiśniewski", "Cloud architect, speaks about Azure and Kubernetes."),
+            ("Katarzyna", "Zielińska", null));
+        AddSpeakers(speakers, conferences, "Frontend Day",
+            ("Marek", "Kowalczyk", "Frontend lead, React and TypeScript enthusiast."),
+            ("Ewa", "Lewandowska", "Designer turned developer, cares about accessibility."));
+        AddSpeakers(speakers, conferences, "Women in Tech Meetup",
+            ("Joanna", "Mazur", null));
+        AddSpeakers(speakers, conferences, "Data & AI Conference",
+            ("Tomasz", "Kamiński", "ML engineer, builds recommendation systems in production."),
+            ("Magdalena", "Dąbrowska", "Data engineer working with streaming pipelines."));
+        AddSpeakers(speakers, conferences, "Past Conference (finished)",
+            ("Adam", "Szymański", "Speaker of a conference that is already over."));
+        AddSpeakers(speakers, conferences, "Cancelled Conference (soft deleted)",
+            ("Zofia", "Woźniak", null));
+
+        if (speakers.Count == 0)
+        {
+            return;
+        }
+
+        context.Speakers.AddRange(speakers);
+        await context.SaveChangesAsync();
+        logger.LogInformation("Seeded {Count} sample speakers", speakers.Count);
+    }
+
+    // Looks the sample conferences up by name; names that do not exist (e.g. a real database) are skipped.
+    private static async Task<Dictionary<string, Guid>> GetSeededConferencesAsync(AppDbContext context)
+    {
+        var conferences = await context.Conferences
+            .OrderBy(c => c.CreatedAt)
+            .Select(c => new { c.Name, c.Id })
+            .ToListAsync();
+
+        // Conference names are not unique, so keep the oldest one per name.
+        var byName = new Dictionary<string, Guid>();
+        foreach (var conference in conferences)
+        {
+            byName.TryAdd(conference.Name, conference.Id);
+        }
+
+        return byName;
+    }
+
+    private static void AddRooms(
+        List<Room> rooms,
+        Dictionary<string, Guid> conferences,
+        string conferenceName,
+        params (string Name, int? Capacity)[] items)
+    {
+        if (!conferences.TryGetValue(conferenceName, out var conferenceId))
+        {
+            return;
+        }
+
+        rooms.AddRange(items.Select(i => new Room
+        {
+            ConferenceId = conferenceId,
+            Name = i.Name,
+            Capacity = i.Capacity
+        }));
+    }
+
+    private static void AddSpeakers(
+        List<Speaker> speakers,
+        Dictionary<string, Guid> conferences,
+        string conferenceName,
+        params (string FirstName, string LastName, string? Bio)[] items)
+    {
+        if (!conferences.TryGetValue(conferenceName, out var conferenceId))
+        {
+            return;
+        }
+
+        speakers.AddRange(items.Select(i => new Speaker
+        {
+            ConferenceId = conferenceId,
+            FirstName = i.FirstName,
+            LastName = i.LastName,
+            Bio = i.Bio
+        }));
     }
 }

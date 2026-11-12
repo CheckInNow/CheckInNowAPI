@@ -7,5 +7,7 @@ namespace Application.Abstractions.Data;
 public interface IAppDbContext
 {
     DbSet<Conference> Conferences { get; }
+    DbSet<Room> Rooms { get; }
+    DbSet<Speaker> Speakers { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
