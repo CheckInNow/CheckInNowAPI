@@ -38,6 +38,6 @@ public sealed class CreateConferenceCommandHandler(IAppDbContext dbContext, ICur
             conference.EndDate,
             conference.Location,
             conference.ParticipantLimit
-        )   );
+        ));
     }
 }

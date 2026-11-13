@@ -1,4 +1,5 @@
 using Application.Abstractions.Data;
+using Application.Abstractions.Identity;
 using Application.Abstractions.Messaging;
 using Domain.Common;
 using Domain.Entities;
@@ -6,7 +7,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.Sessions.Create;
 
-public sealed class CreateSessionCommandHandler(IAppDbContext context) : ICommandHandler<CreateSessionCommand, CreateSessionResponse>
+public sealed class CreateSessionCommandHandler(IAppDbContext context, ICurrentUser currentUser)
+    : ICommandHandler<CreateSessionCommand, CreateSessionResponse>
 {
     public async Task<Result<CreateSessionResponse>> Handle(CreateSessionCommand command, CancellationToken cancellationToken)
     {
@@ -14,6 +16,7 @@ public sealed class CreateSessionCommandHandler(IAppDbContext context) : IComman
             .Where(c => c.Id == command.ConferenceId && c.DeletedAt == null)
             .Select(c => new
             {
+                c.OrganizerId,
                 ConferenceStartDate = c.StartDate,
                 ConferenceEndDate = c.EndDate,
                 RoomExists = c.Rooms.Any(r => r.Id == command.RoomId),
@@ -34,6 +37,11 @@ public sealed class CreateSessionCommandHandler(IAppDbContext context) : IComman
         if (info is null)
         {
             return Result.Failure<CreateSessionResponse>(Error.NotFound("Conference.NotFound", $"Conference with ID '{command.ConferenceId}' was not found."));
+        }
+
+        if (currentUser.UserId != info.OrganizerId)
+        {
+            return Result.Failure<CreateSessionResponse>(Error.Forbidden("Session.Forbidden", "Only the conference owner can add sessions."));
         }
 
         if (!info.RoomExists)
