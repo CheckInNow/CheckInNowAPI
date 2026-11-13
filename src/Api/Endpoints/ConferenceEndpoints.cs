@@ -78,8 +78,8 @@ public static class ConferenceEndpoints
     {
         var result = await sender.Send(command, cancellationToken);
         return result.IsSuccess
-            ? TypedResults.CreatedAtRoute(result.Value, "GetConferenceById", new { id = result.Value!.Id })
-            : result.ToProblemDetails();
+        ? TypedResults.CreatedAtRoute(result.Value, "GetConferenceById", new { id = result.Value!.Id })
+        : result.ToProblemDetails();
     }
 
     private static async Task<IResult> UpdateConference(
