@@ -122,6 +122,7 @@ try
     app.MapConferenceEndpoints();
     app.MapRoomEndpoints();
     app.MapSpeakerEndpoints();
+    app.MapSessionEndpoints();
 
     // Aspire default endpoints (health, alive)
     app.MapDefaultEndpoints();
