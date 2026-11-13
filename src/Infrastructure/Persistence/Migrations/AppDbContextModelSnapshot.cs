@@ -219,10 +219,10 @@ namespace Infrastructure.Migrations
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("RoomId")
+                    b.Property<Guid>("RoomId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("SpeakerId")
+                    b.Property<Guid>("SpeakerId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("StartTime")
@@ -439,11 +439,15 @@ namespace Infrastructure.Migrations
 
                     b.HasOne("Domain.Entities.Room", "Room")
                         .WithMany()
-                        .HasForeignKey("RoomId");
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Domain.Entities.Speaker", "Speaker")
                         .WithMany()
-                        .HasForeignKey("SpeakerId");
+                        .HasForeignKey("SpeakerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Conference");
 

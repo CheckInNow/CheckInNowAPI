@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20261113140702_AddConferenceSessions")]
+    [Migration("20261113172140_AddConferenceSessions")]
     partial class AddConferenceSessions
     {
         /// <inheritdoc />
@@ -222,10 +222,10 @@ namespace Infrastructure.Migrations
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("RoomId")
+                    b.Property<Guid>("RoomId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("SpeakerId")
+                    b.Property<Guid>("SpeakerId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("StartTime")
@@ -442,11 +442,15 @@ namespace Infrastructure.Migrations
 
                     b.HasOne("Domain.Entities.Room", "Room")
                         .WithMany()
-                        .HasForeignKey("RoomId");
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Domain.Entities.Speaker", "Speaker")
                         .WithMany()
-                        .HasForeignKey("SpeakerId");
+                        .HasForeignKey("SpeakerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Conference");
 

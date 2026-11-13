@@ -11,8 +11,8 @@ public sealed class Session : AuditableEntity
     public DateTimeOffset? DeletedAt { get; set; } = null;
     public Guid ConferenceId { get; set; }
     public Conference Conference { get; set; } = default!;
-    public Speaker? Speaker { get; set; } = null;
-    public Guid? SpeakerId { get; set; } = null;
-    public Room? Room { get; set; } = null;
-    public Guid? RoomId { get; set; } = null;
+    public Speaker Speaker { get; set; } = default!;
+    public Guid SpeakerId { get; set; }
+    public Room Room { get; set; } = default!;
+    public Guid RoomId { get; set; }
 }
