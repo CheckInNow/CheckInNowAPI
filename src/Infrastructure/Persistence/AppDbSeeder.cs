@@ -1,3 +1,4 @@
+using System.Globalization;
 using Domain.Constants;
 using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -25,6 +26,7 @@ public static class AppDbSeeder
         await SeedConferencesAsync(context, userManager, logger);
         await SeedRoomsAsync(context, logger);
         await SeedSpeakersAsync(context, logger);
+        await SeedSessionsAsync(context, logger);
     }
 
     private static async Task SeedRolesAsync(RoleManager<IdentityRole<Guid>> roleManager, ILogger logger)
@@ -262,7 +264,138 @@ public static class AppDbSeeder
         logger.LogInformation("Seeded {Count} sample speakers", speakers.Count);
     }
 
-    // Looks the sample conferences up by name; names that do not exist (e.g. a real database) are skipped.
+    private static async Task SeedSessionsAsync(AppDbContext context, ILogger logger)
+    {
+        if (await context.Sessions.AnyAsync())
+        {
+            return;
+        }
+
+        var conferences = new Dictionary<string, (Guid Id, DateTimeOffset StartDate)>();
+        foreach (var conference in await context.Conferences.AsNoTracking().OrderBy(c => c.CreatedAt).ToListAsync())
+        {
+            conferences.TryAdd(conference.Name, (conference.Id, conference.StartDate));
+        }
+
+        var rooms = new Dictionary<(Guid ConferenceId, string Name), Guid>();
+        foreach (var room in await context.Rooms.AsNoTracking().ToListAsync())
+        {
+            rooms.TryAdd((room.ConferenceId, room.Name), room.Id);
+        }
+
+        var speakers = new Dictionary<(Guid ConferenceId, string FullName), Guid>();
+        foreach (var speaker in await context.Speakers.AsNoTracking().ToListAsync())
+        {
+            speakers.TryAdd((speaker.ConferenceId, $"{speaker.FirstName} {speaker.LastName}"), speaker.Id);
+        }
+
+        var lookup = new SessionLookup(conferences, rooms, speakers);
+        var sessions = new List<Session>();
+
+        AddSessions(sessions, lookup, "CheckInNow Tech Summit",
+            new("Main Hall", "Anna Nowak", 0, "09:00", "09:45", "Opening keynote: building .NET systems that last",
+                "Welcome and a look at what makes a system easy to change."),
+            new("Main Hall", "Piotr Wiśniewski", 0, "09:45", "10:45", "Kubernetes for .NET developers",
+                "Containers, probes and rollouts without the buzzwords."),
+            new("Workshop Room A", "Anna Nowak", 0, "10:00", "12:00", "Workshop: Clean Architecture with MediatR",
+                "Hands-on: commands, queries and validation pipelines."),
+            new("Workshop Room B", "Katarzyna Zielińska", 0, "10:00", "11:30", "Workshop: testing with xUnit and NSubstitute"),
+            new("Main Hall", "Piotr Wiśniewski", 0, "11:30", "12:15", "Observability with OpenTelemetry and Aspire",
+                "Traces, metrics and logs in one dashboard."),
+            new("Main Hall", "Anna Nowak", 0, "13:00", "14:00", "Lessons learned from production incidents"),
+            new("Main Hall", "Katarzyna Zielińska", 1, "09:30", "10:30", "Entity Framework Core performance tips",
+                "Tracking, projections and the queries that hurt."),
+            new("Workshop Room A", "Piotr Wiśniewski", 1, "11:00", "12:30", "Workshop: deploying to Azure with GitHub Actions"),
+            new("Workshop Room B", "Katarzyna Zielińska", 1, "13:00", "14:00", "Cancelled workshop (soft deleted)",
+                "Soft deleted, should never be returned by the API.", Deleted: true),
+            new("Main Hall", "Anna Nowak", 1, "15:00", "16:00", "Closing panel: the future of .NET"));
+
+        AddSessions(sessions, lookup, "Frontend Day",
+            new("Main Stage", "Marek Kowalczyk", 0, "10:00", "11:00", "Modern React: server components in practice",
+                "What changes when the server renders your components."),
+            new("Lab", "Marek Kowalczyk", 0, "11:00", "13:00", "Workshop: Vite, TypeScript and testing"),
+            new("Main Stage", "Ewa Lewandowska", 0, "11:30", "12:30", "Accessibility is not optional"),
+            new("Main Stage", "Ewa Lewandowska", 0, "14:00", "15:00", "Design systems from scratch",
+                "Tokens, components and keeping designers and developers in sync."));
+
+        AddSessions(sessions, lookup, "Women in Tech Meetup",
+            new("Online", "Joanna Mazur", 0, "17:00", "17:45", "Breaking into tech: stories and lessons"),
+            new("Online", "Joanna Mazur", 0, "18:00", "19:00", "Panel: growing as a technical leader",
+                "Moderated discussion, questions from the audience welcome."));
+
+        AddSessions(sessions, lookup, "Data & AI Conference",
+            new("Auditorium", "Tomasz Kamiński", 0, "09:30", "10:30", "Machine learning in production: what breaks first",
+                "Drift, latency and the boring failures nobody plans for."),
+            new("Room 1", "Magdalena Dąbrowska", 0, "10:00", "11:30", "Streaming pipelines with Kafka"),
+            new("Auditorium", "Tomasz Kamiński", 0, "11:00", "12:00", "Feature stores explained"),
+            new("Auditorium", "Tomasz Kamiński", 1, "14:00", "15:30", "Evaluating models after deployment"),
+            new("Auditorium", "Magdalena Dąbrowska", 2, "10:00", "11:00", "Data quality: tests for your pipelines"));
+
+        AddSessions(sessions, lookup, "Past Conference (finished)",
+            new("Aula", "Adam Szymański", 0, "10:00", "11:00", "Opening talk"),
+            new("Aula", "Adam Szymański", 1, "10:00", "12:00", "Wrap-up and lessons learned"));
+
+        if (sessions.Count == 0)
+        {
+            return;
+        }
+
+        context.Sessions.AddRange(sessions);
+        await context.SaveChangesAsync();
+        logger.LogInformation("Seeded {Count} sample sessions", sessions.Count);
+    }
+
+    private readonly record struct SessionSeed(
+        string Room,
+        string Speaker,
+        int Day,
+        string Start,
+        string End,
+        string Title,
+        string? Description = null,
+        bool Deleted = false);
+
+    private sealed record SessionLookup(
+        Dictionary<string, (Guid Id, DateTimeOffset StartDate)> Conferences,
+        Dictionary<(Guid ConferenceId, string Name), Guid> Rooms,
+        Dictionary<(Guid ConferenceId, string FullName), Guid> Speakers);
+
+    private static void AddSessions(
+        List<Session> sessions,
+        SessionLookup lookup,
+        string conferenceName,
+        params SessionSeed[] items)
+    {
+        if (!lookup.Conferences.TryGetValue(conferenceName, out var conference))
+        {
+            return;
+        }
+
+        var firstDay = new DateTimeOffset(conference.StartDate.UtcDateTime.Date, TimeSpan.Zero);
+
+        foreach (var item in items)
+        {
+            if (!lookup.Rooms.TryGetValue((conference.Id, item.Room), out var roomId)
+                || !lookup.Speakers.TryGetValue((conference.Id, item.Speaker), out var speakerId))
+            {
+                continue;
+            }
+
+            var day = firstDay.AddDays(item.Day);
+            sessions.Add(new Session
+            {
+                ConferenceId = conference.Id,
+                RoomId = roomId,
+                SpeakerId = speakerId,
+                Title = item.Title,
+                Description = item.Description ?? string.Empty,
+                StartTime = day + TimeSpan.Parse(item.Start, CultureInfo.InvariantCulture),
+                EndTime = day + TimeSpan.Parse(item.End, CultureInfo.InvariantCulture),
+                DeletedAt = item.Deleted ? DateTimeOffset.UtcNow : null
+            });
+        }
+    }
+
     private static async Task<Dictionary<string, Guid>> GetSeededConferencesAsync(AppDbContext context)
     {
         var conferences = await context.Conferences
@@ -270,7 +403,6 @@ public static class AppDbSeeder
             .Select(c => new { c.Name, c.Id })
             .ToListAsync();
 
-        // Conference names are not unique, so keep the oldest one per name.
         var byName = new Dictionary<string, Guid>();
         foreach (var conference in conferences)
         {
