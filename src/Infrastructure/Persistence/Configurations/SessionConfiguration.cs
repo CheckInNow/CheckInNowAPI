@@ -34,5 +34,15 @@ public sealed class SessionConfiguration : IEntityTypeConfiguration<Session>
             .WithMany(c => c.Sessions)
             .HasForeignKey(s => s.ConferenceId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(s => s.Room)
+            .WithMany()
+            .HasForeignKey(s => s.RoomId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(s => s.Speaker)
+            .WithMany()
+            .HasForeignKey(s => s.SpeakerId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

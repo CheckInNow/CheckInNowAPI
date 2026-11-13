@@ -18,7 +18,7 @@ public sealed class CreateSessionValidator : AbstractValidator<CreateSessionComm
 
         RuleFor(x => x.EndTime)
             .NotEmpty()
-            .GreaterThanOrEqualTo(x => x.StartTime)
+            .GreaterThan(x => x.StartTime)
             .WithMessage("End time must be on or after the start time.");
 
         RuleFor(x => x.RoomId)
