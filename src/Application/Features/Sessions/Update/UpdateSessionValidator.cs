@@ -21,11 +21,11 @@ public sealed class UpdateSessionValidator : AbstractValidator<UpdateSessionComm
             .MaximumLength(1000);
 
         RuleFor(x => x.RoomId)
-            .NotEmpty()
+            .NotEqual(Guid.Empty)
             .When(x => x.RoomId.HasValue);
 
         RuleFor(x => x.SpeakerId)
-            .NotEmpty()
+            .NotEqual(Guid.Empty)
             .When(x => x.SpeakerId.HasValue);
 
         RuleFor(x => x.EndTime)
