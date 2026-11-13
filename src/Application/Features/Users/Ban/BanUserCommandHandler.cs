@@ -6,8 +6,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Application.Features.Users.Ban;
 
-public sealed class BanUserCommandHandler(UserManager<ApplicationUser> userManager, ICurrentUser currentUser,
-    TimeProvider timeProvider)
+public sealed class BanUserCommandHandler(UserManager<ApplicationUser> userManager, ICurrentUser currentUser)
     : ICommandHandler<BanUserCommand>
 {
     public async Task<Result> Handle(BanUserCommand command, CancellationToken cancellationToken = default)
@@ -15,17 +14,17 @@ public sealed class BanUserCommandHandler(UserManager<ApplicationUser> userManag
         var user = await userManager.FindByIdAsync(command.UserId.ToString());
         if (user is null)
         {
-            return Result.Failure(UserErrors.NotFound(command.UserId));
+            return Result.Failure(Error.NotFound("User.NotFound", $"User with ID '{command.UserId}' was not found."));
         }
 
         if (user.Id == currentUser.UserId)
         {
-            return Result.Failure(UserErrors.CannotModifySelf);
+            return Result.Failure(Error.Forbidden("User.CannotModifySelf", "Administrators cannot ban themselves or change their own roles."));
         }
 
-        if (user.LockoutEnabled && user.LockoutEnd > timeProvider.GetUtcNow())
+        if (user.LockoutEnabled && user.LockoutEnd > DateTimeOffset.UtcNow)
         {
-            return Result.Failure(UserErrors.AlreadyBanned);
+            return Result.Failure(Error.Conflict("User.AlreadyBanned", "The user is already banned."));
         }
 
         // Account-level ban: permanent Identity lockout. No data is deleted.
@@ -39,6 +38,6 @@ public sealed class BanUserCommandHandler(UserManager<ApplicationUser> userManag
         var result = await userManager.UpdateAsync(user);
         return result.Succeeded
             ? Result.Success()
-            : Result.Failure(UserErrors.UpdateFailed(string.Join(" ", result.Errors.Select(e => e.Description))));
+            : Result.Failure(Error.Failure("User.UpdateFailed", string.Join(" ", result.Errors.Select(e => e.Description))));
     }
 }

@@ -15,22 +15,22 @@ public sealed class AddOrganizerRoleCommandHandler(UserManager<ApplicationUser> 
         var user = await userManager.FindByIdAsync(command.UserId.ToString());
         if (user is null)
         {
-            return Result.Failure(UserErrors.NotFound(command.UserId));
+            return Result.Failure(Error.NotFound("User.NotFound", $"User with ID '{command.UserId}' was not found."));
         }
 
         if (user.Id == currentUser.UserId)
         {
-            return Result.Failure(UserErrors.CannotModifySelf);
+            return Result.Failure(Error.Forbidden("User.CannotModifySelf", "Administrators cannot ban themselves or change their own roles."));
         }
 
         if (await userManager.IsInRoleAsync(user, Roles.Organizer))
         {
-            return Result.Failure(UserErrors.AlreadyOrganizer);
+            return Result.Failure(Error.Conflict("User.AlreadyOrganizer", "The user already has the Organizer role."));
         }
 
         var result = await userManager.AddToRoleAsync(user, Roles.Organizer);
         return result.Succeeded
             ? Result.Success()
-            : Result.Failure(UserErrors.UpdateFailed(string.Join(" ", result.Errors.Select(e => e.Description))));
+            : Result.Failure(Error.Failure("User.UpdateFailed", string.Join(" ", result.Errors.Select(e => e.Description))));
     }
 }

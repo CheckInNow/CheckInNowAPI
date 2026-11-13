@@ -5,12 +5,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.Users.GetAll;
 
-public sealed class GetUsersQueryHandler(IAppDbContext dbContext, TimeProvider timeProvider)
+public sealed class GetUsersQueryHandler(IAppDbContext dbContext)
     : IQueryHandler<GetUsersQuery, PagedResult<UserListItemResponse>>
 {
     public async Task<Result<PagedResult<UserListItemResponse>>> Handle(GetUsersQuery query, CancellationToken cancellationToken = default)
     {
-        var now = timeProvider.GetUtcNow();
+        var now = DateTimeOffset.UtcNow;
         var users = dbContext.Users.AsNoTracking();
 
         if (!string.IsNullOrWhiteSpace(query.Search))

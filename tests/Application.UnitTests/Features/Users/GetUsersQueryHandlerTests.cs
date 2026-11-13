@@ -25,7 +25,7 @@ public sealed class GetUsersQueryHandlerTests
             new IdentityUserRole<Guid> { UserId = older.Id, RoleId = userRole.Id },
             new IdentityUserRole<Guid> { UserId = older.Id, RoleId = organizerRole.Id });
         await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
-        var handler = new GetUsersQueryHandler(dbContext, TimeProvider.System);
+        var handler = new GetUsersQueryHandler(dbContext);
 
         // Act
         var result = await handler.Handle(new GetUsersQuery(Page: 1, PageSize: 1), TestContext.Current.CancellationToken);
@@ -54,7 +54,7 @@ public sealed class GetUsersQueryHandlerTests
         await using var dbContext = TestDbContextFactory.Create();
         var anna = await SeedUserAsync(dbContext, "Anna", "Nowak", "anna@example.com", DateTimeOffset.UtcNow);
         await SeedUserAsync(dbContext, "Jan", "Kowalski", "jan@example.com", DateTimeOffset.UtcNow);
-        var handler = new GetUsersQueryHandler(dbContext, TimeProvider.System);
+        var handler = new GetUsersQueryHandler(dbContext);
 
         // Act
         var result = await handler.Handle(new GetUsersQuery(Search: search), TestContext.Current.CancellationToken);
@@ -73,7 +73,7 @@ public sealed class GetUsersQueryHandlerTests
         var user = await SeedUserAsync(dbContext, "Anna", "Nowak", "anna@example.com", DateTimeOffset.UtcNow);
         dbContext.UserRoles.Add(new IdentityUserRole<Guid> { UserId = user.Id, RoleId = userRole.Id });
         await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
-        var handler = new GetUserQueryHandler(dbContext, TimeProvider.System);
+        var handler = new GetUserQueryHandler(dbContext);
 
         // Act
         var result = await handler.Handle(new GetUserQuery(user.Id), TestContext.Current.CancellationToken);
@@ -90,7 +90,7 @@ public sealed class GetUsersQueryHandlerTests
     {
         // Arrange
         await using var dbContext = TestDbContextFactory.Create();
-        var handler = new GetUserQueryHandler(dbContext, TimeProvider.System);
+        var handler = new GetUserQueryHandler(dbContext);
 
         // Act
         var result = await handler.Handle(new GetUserQuery(Guid.NewGuid()), TestContext.Current.CancellationToken);

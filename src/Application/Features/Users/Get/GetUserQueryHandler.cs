@@ -5,12 +5,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.Users.Get;
 
-public sealed class GetUserQueryHandler(IAppDbContext dbContext, TimeProvider timeProvider)
+public sealed class GetUserQueryHandler(IAppDbContext dbContext)
     : IQueryHandler<GetUserQuery, UserDetailResponse>
 {
     public async Task<Result<UserDetailResponse>> Handle(GetUserQuery query, CancellationToken cancellationToken = default)
     {
-        var now = timeProvider.GetUtcNow();
+        var now = DateTimeOffset.UtcNow;
 
         var user = await dbContext.Users
             .AsNoTracking()
@@ -32,7 +32,7 @@ public sealed class GetUserQueryHandler(IAppDbContext dbContext, TimeProvider ti
             .FirstOrDefaultAsync(cancellationToken);
 
         return user is null
-            ? Result.Failure<UserDetailResponse>(UserErrors.NotFound(query.Id))
+            ? Result.Failure<UserDetailResponse>(Error.NotFound("User.NotFound", $"User with ID '{query.Id}' was not found."))
             : Result.Success(user);
     }
 }

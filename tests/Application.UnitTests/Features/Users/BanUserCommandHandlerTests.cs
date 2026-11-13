@@ -33,8 +33,8 @@ public sealed class BanUserCommandHandlerTests
         _userManager.FindByIdAsync(_user.Id.ToString()).Returns(_user);
         _userManager.UpdateAsync(Arg.Any<ApplicationUser>()).Returns(IdentityResult.Success);
 
-        _banHandler = new BanUserCommandHandler(_userManager, _currentUser, TimeProvider.System);
-        _unbanHandler = new UnbanUserCommandHandler(_userManager, _currentUser, TimeProvider.System);
+        _banHandler = new BanUserCommandHandler(_userManager, _currentUser);
+        _unbanHandler = new UnbanUserCommandHandler(_userManager, _currentUser);
     }
 
     [Fact]
