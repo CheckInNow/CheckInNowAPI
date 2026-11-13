@@ -15,4 +15,5 @@ public sealed class Conference : AuditableEntity
     public DateTimeOffset? DeletedAt { get; set; } = null;
     public ICollection<Room> Rooms { get; set; } = new List<Room>();
     public ICollection<Speaker> Speakers { get; set; } = new List<Speaker>();
+    public ICollection<Session> Sessions { get; set; } = new List<Session>();
 }
