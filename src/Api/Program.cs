@@ -123,6 +123,7 @@ try
     app.MapRoomEndpoints();
     app.MapSpeakerEndpoints();
     app.MapSessionEndpoints();
+    app.MapAdminUserEndpoints();
 
     // Aspire default endpoints (health, alive)
     app.MapDefaultEndpoints();
