@@ -83,7 +83,7 @@ public sealed class GoogleLoginCommandHandler(
 
         if (await userManager.IsLockedOutAsync(user))
         {
-            return Result.Failure<TokenResponse>(Error.Failure("Auth.LockedOut", "Account is locked out"));
+            return Result.Failure<TokenResponse>(Error.Forbidden("Auth.LockedOut", "Account is locked out."));
         }
 
         var response = await tokens.GenerateTokenAsync(user, ct);
