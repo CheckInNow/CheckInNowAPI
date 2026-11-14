@@ -51,9 +51,7 @@ public sealed class TokenService(
 
     public async Task<TokenResponse> RefreshTokenAsync(string accessToken, string refreshToken, CancellationToken cancellationToken = default)
     {
-        var principal = GetPrincipalFromExpiredToken(accessToken);
-        var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier)
-                     ?? throw new InvalidOperationException("Invalid access token.");
+        var userId = GetUserIdFromExpiredToken(accessToken);
 
         var user = await userManager.FindByIdAsync(userId)
                    ?? throw new InvalidOperationException("User not found.");
@@ -64,6 +62,13 @@ public sealed class TokenService(
         }
 
         return await GenerateTokenAsync(user, cancellationToken);
+    }
+
+    public string GetUserIdFromExpiredToken(string accessToken)
+    {
+        var principal = GetPrincipalFromExpiredToken(accessToken);
+        return principal.FindFirstValue(ClaimTypes.NameIdentifier)
+               ?? throw new InvalidOperationException("Invalid access token.");
     }
 
     private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)

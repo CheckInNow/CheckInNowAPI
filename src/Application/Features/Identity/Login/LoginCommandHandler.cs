@@ -19,11 +19,19 @@ public sealed class LoginCommandHandler(
             return Result.Failure<TokenResponse>(Error.Validation("Auth.InvalidCredentials", "Invalid email or password."));
         }
 
+        if (await userManager.IsLockedOutAsync(user))
+        {
+            return Result.Failure<TokenResponse>(Error.Forbidden("Auth.LockedOut", "Account is locked out."));
+        }
+
         var isValidPassword = await userManager.CheckPasswordAsync(user, command.Password);
         if (!isValidPassword)
         {
+            await userManager.AccessFailedAsync(user);
             return Result.Failure<TokenResponse>(Error.Validation("Auth.InvalidCredentials", "Invalid email or password."));
         }
+
+        await userManager.ResetAccessFailedCountAsync(user);
 
         var token = await tokenService.GenerateTokenAsync(user, cancellationToken);
         return Result.Success(token);
