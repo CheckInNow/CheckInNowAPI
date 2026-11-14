@@ -19,7 +19,7 @@ public sealed class RefreshTokenCommandHandler(
             var user = await userManager.FindByIdAsync(userId);
             if (user is not null && await userManager.IsLockedOutAsync(user))
             {
-                return Result.Failure<TokenResponse>(Error.Failure("Auth.LockedOut", "Account is locked out"));
+                return Result.Failure<TokenResponse>(Error.Forbidden("Auth.LockedOut", "Account is locked out."));
             }
 
             var token = await tokenService.RefreshTokenAsync(command.AccessToken, command.RefreshToken, cancellationToken);
