@@ -1,5 +1,4 @@
 using Application.Abstractions.Messaging;
-using Application.Features.Conferences.Get;
 
 namespace Application.Features.Conferences.Create;
 
@@ -9,4 +8,14 @@ public sealed record CreateConferenceCommand(
     DateTimeOffset StartDate,
     DateTimeOffset EndDate,
     string Location,
-    int ParticipantLimit) : ICommand<ConferenceDetailResponse>;
+    int ParticipantLimit) : ICommand<CreateConferenceResponse>;
+
+public sealed record CreateConferenceResponse(
+    Guid Id,
+    string Name,
+    string Description,
+    DateTimeOffset StartDate,
+    DateTimeOffset EndDate,
+    string Location,
+    int ParticipantLimit
+    );

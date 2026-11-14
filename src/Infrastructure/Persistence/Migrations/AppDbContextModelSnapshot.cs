@@ -17,7 +17,7 @@ namespace Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.13")
+                .HasAnnotation("ProductVersion", "10.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -185,6 +185,66 @@ namespace Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Rooms");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Session", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ConferenceId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTimeOffset>("EndTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("LastModifiedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("RoomId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("SpeakerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("StartTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ConferenceId");
+
+                    b.HasIndex("RoomId");
+
+                    b.HasIndex("SpeakerId");
+
+                    b.ToTable("Sessions", t =>
+                        {
+                            t.HasCheckConstraint("CK_Sessions_StartTime_Before_EndTime", "\"StartTime\" < \"EndTime\"");
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Speaker", b =>
@@ -369,6 +429,33 @@ namespace Infrastructure.Migrations
                     b.Navigation("Conference");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Session", b =>
+                {
+                    b.HasOne("Domain.Entities.Conference", "Conference")
+                        .WithMany("Sessions")
+                        .HasForeignKey("ConferenceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Room", "Room")
+                        .WithMany()
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Speaker", "Speaker")
+                        .WithMany()
+                        .HasForeignKey("SpeakerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Conference");
+
+                    b.Navigation("Room");
+
+                    b.Navigation("Speaker");
+                });
+
             modelBuilder.Entity("Domain.Entities.Speaker", b =>
                 {
                     b.HasOne("Domain.Entities.Conference", "Conference")
@@ -439,6 +526,8 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.Conference", b =>
                 {
                     b.Navigation("Rooms");
+
+                    b.Navigation("Sessions");
 
                     b.Navigation("Speakers");
                 });

@@ -14,6 +14,8 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
     public DbSet<Room> Rooms => Set<Room>();
     public DbSet<Speaker> Speakers => Set<Speaker>();
 
+    public DbSet<Session> Sessions => Set<Session>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
