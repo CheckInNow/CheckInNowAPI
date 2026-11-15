@@ -16,4 +16,5 @@ public sealed class Conference : AuditableEntity
     public ICollection<Room> Rooms { get; set; } = new List<Room>();
     public ICollection<Speaker> Speakers { get; set; } = new List<Speaker>();
     public ICollection<Session> Sessions { get; set; } = new List<Session>();
+    public ICollection<Registration> Registrations { get; set; } = new List<Registration>();
 }

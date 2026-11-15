@@ -162,6 +162,40 @@ namespace Infrastructure.Migrations
                     b.ToTable("Conferences");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Registration", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ConferenceId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("LastModifiedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ConferenceId");
+
+                    b.HasIndex("UserId", "ConferenceId")
+                        .IsUnique();
+
+                    b.ToTable("Registrations");
+                });
+
             modelBuilder.Entity("Domain.Entities.Room", b =>
                 {
                     b.Property<Guid>("Id")
@@ -418,6 +452,25 @@ namespace Infrastructure.Migrations
                     b.Navigation("Organizer");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Registration", b =>
+                {
+                    b.HasOne("Domain.Entities.Conference", "Conference")
+                        .WithMany("Registrations")
+                        .HasForeignKey("ConferenceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.ApplicationUser", "User")
+                        .WithMany("Registrations")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Conference");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Domain.Entities.Room", b =>
                 {
                     b.HasOne("Domain.Entities.Conference", "Conference")
@@ -521,10 +574,14 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.ApplicationUser", b =>
                 {
                     b.Navigation("Conferences");
+
+                    b.Navigation("Registrations");
                 });
 
             modelBuilder.Entity("Domain.Entities.Conference", b =>
                 {
+                    b.Navigation("Registrations");
+
                     b.Navigation("Rooms");
 
                     b.Navigation("Sessions");
