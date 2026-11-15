@@ -4,6 +4,7 @@ using Application.Features.Conferences.Create;
 using Application.Features.Conferences.Delete;
 using Application.Features.Conferences.Get;
 using Application.Features.Conferences.GetAll;
+using Application.Features.Conferences.GetMy;
 using Application.Features.Conferences.Update;
 using Domain.Common;
 using MediatR;
@@ -23,6 +24,14 @@ public static class ConferenceEndpoints
             .WithSummary("Get paginated conferences.")
             .Produces<PagedResult<ConferenceListItemResponse>>(StatusCodes.Status200OK)
             .AllowAnonymous();
+
+        group.MapGet("/my", GetMyConferences)
+            .WithName("GetMyConferences")
+            .WithSummary("Get paginated conferences owned by the current organizer.")
+            .Produces<PagedResult<ConferenceListItemResponse>>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .RequireAuthorization("Organizer");
 
         group.MapGet("/{id:guid}", GetConferenceById)
             .WithName("GetConferenceById")
@@ -106,6 +115,15 @@ public static class ConferenceEndpoints
 
     private static async Task<IResult> GetConferences(
         [AsParameters] GetAllConferencesQuery query,
+        [FromServices] ISender sender,
+        CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(query, cancellationToken);
+        return result.IsSuccess ? TypedResults.Ok(result.Value) : result.ToProblemDetails();
+    }
+
+    private static async Task<IResult> GetMyConferences(
+        [AsParameters] GetMyConferencesQuery query,
         [FromServices] ISender sender,
         CancellationToken cancellationToken)
     {
