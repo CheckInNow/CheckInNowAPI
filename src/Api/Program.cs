@@ -121,6 +121,7 @@ try
     app.MapIdentityEndpoints();
     app.MapConferenceEndpoints();
     app.MapRoomEndpoints();
+    app.MapRegistrationEndpoints();
     app.MapSpeakerEndpoints();
     app.MapSessionEndpoints();
     app.MapAdminUserEndpoints();
