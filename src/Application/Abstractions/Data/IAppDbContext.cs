@@ -13,5 +13,6 @@ public interface IAppDbContext
     DbSet<Room> Rooms { get; }
     DbSet<Speaker> Speakers { get; }
     DbSet<Session> Sessions { get; }
+    DbSet<Registration> Registrations { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
