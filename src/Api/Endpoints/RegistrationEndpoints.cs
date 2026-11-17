@@ -3,6 +3,7 @@ using Application.Features.Registrations.Create;
 using Application.Features.Registrations.Delete;
 using Application.Features.Registrations.Get;
 using Application.Features.Registrations.GetAll;
+using Application.Features.Registrations.GetTicket;
 using Domain.Common;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -54,6 +55,14 @@ public static class RegistrationEndpoints
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status409Conflict)
             .RequireAuthorization();
+
+        group.MapGet("/{registrationId:guid}/ticket", GetRegistrationTicket)
+            .WithName("GetRegistrationTicket")
+            .WithSummary("Get the ticket for a registration. Only the registered user can do this.")
+            .Produces<RegistrationTicketResponse>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .RequireAuthorization();
     }
 
     private static async Task<IResult> GetRegistrations(
@@ -94,5 +103,16 @@ public static class RegistrationEndpoints
     {
         var result = await sender.Send(new DeleteRegistrationCommand(conferenceId, registrationId), cancellationToken);
         return result.IsSuccess ? TypedResults.NoContent() : result.ToProblemDetails();
+    }
+
+    private static async Task<IResult> GetRegistrationTicket(
+        [FromRoute] Guid conferenceId,
+        [FromRoute] Guid registrationId,
+        [FromServices] ISender sender,
+        CancellationToken cancellationToken)
+    {
+        //var result = await sender.Send(query, cancellationToken);
+        //return result.IsSuccess ? TypedResults.Ok(result.Value) : result.ToProblemDetails();
+        return TypedResults.Problem("Not implemented yet.", statusCode: StatusCodes.Status501NotImplemented);
     }
 }
