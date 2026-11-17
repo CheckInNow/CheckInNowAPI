@@ -13,6 +13,9 @@ public sealed class RegistrationConfiguration : IEntityTypeConfiguration<Registr
         builder.HasIndex(r => new { r.UserId, r.ConferenceId })
             .IsUnique();
 
+        builder.HasIndex(r => r.TicketCode)
+            .IsUnique();
+
         builder.HasOne(r => r.Conference)
             .WithMany(c => c.Registrations)
             .HasForeignKey(r => r.ConferenceId)

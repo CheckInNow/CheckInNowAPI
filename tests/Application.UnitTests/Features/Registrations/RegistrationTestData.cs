@@ -52,7 +52,12 @@ internal static class RegistrationTestData
         Guid userId,
         DateTimeOffset? createdAt = null)
     {
-        var registration = new Registration { ConferenceId = conferenceId, UserId = userId };
+        var registration = new Registration
+        {
+            ConferenceId = conferenceId,
+            UserId = userId,
+            TicketCode = Guid.NewGuid()
+        };
         dbContext.Registrations.Add(registration);
         await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
