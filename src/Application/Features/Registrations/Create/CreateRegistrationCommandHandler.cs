@@ -69,7 +69,8 @@ public sealed class CreateRegistrationCommandHandler(IAppDbContext context, ICur
         var registration = new Registration
         {
             ConferenceId = request.ConferenceId,
-            UserId = userId.Value
+            UserId = userId.Value,
+            TicketCode = Guid.NewGuid()
         };
 
         context.Registrations.Add(registration);

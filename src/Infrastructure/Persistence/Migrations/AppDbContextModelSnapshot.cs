@@ -183,12 +183,18 @@ namespace Infrastructure.Migrations
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("text");
 
+                    b.Property<Guid>("TicketCode")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ConferenceId");
+
+                    b.HasIndex("TicketCode")
+                        .IsUnique();
 
                     b.HasIndex("UserId", "ConferenceId")
                         .IsUnique();
