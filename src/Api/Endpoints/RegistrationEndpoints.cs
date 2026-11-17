@@ -111,8 +111,7 @@ public static class RegistrationEndpoints
         [FromServices] ISender sender,
         CancellationToken cancellationToken)
     {
-        //var result = await sender.Send(query, cancellationToken);
-        //return result.IsSuccess ? TypedResults.Ok(result.Value) : result.ToProblemDetails();
-        return TypedResults.Problem("Not implemented yet.", statusCode: StatusCodes.Status501NotImplemented);
+        var result = await sender.Send(new GetTicketQuery(conferenceId, registrationId), cancellationToken);
+        return result.IsSuccess ? TypedResults.Ok(result.Value) : result.ToProblemDetails();
     }
 }
