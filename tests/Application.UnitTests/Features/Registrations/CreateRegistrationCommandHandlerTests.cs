@@ -210,4 +210,44 @@ public sealed class CreateRegistrationCommandHandlerTests
         result.Error.Code.Should().Be("Registration.ParticipantLimitReached");
         dbContext.Registrations.Should().HaveCount(1);
     }
+
+    [Fact]
+    public async Task Handle_Should_Assign_A_Ticket_Code_Different_From_The_Registration_Id()
+    {
+        // Arrange
+        await using var dbContext = TestDbContextFactory.Create();
+        var conference = await SeedConferenceAsync(dbContext);
+        var user = await SeedUserAsync(dbContext);
+        _currentUser.UserId.Returns(user.Id);
+        var handler = new CreateRegistrationCommandHandler(dbContext, _currentUser);
+
+        // Act
+        var result = await handler.Handle(new CreateRegistrationCommand(conference.Id), TestContext.Current.CancellationToken);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        var registration = dbContext.Registrations.Single();
+        registration.TicketCode.Should().NotBeEmpty();
+        registration.TicketCode.Should().NotBe(registration.Id);
+    }
+
+    [Fact]
+    public async Task Handle_Should_Assign_Different_Ticket_Codes_To_Different_Registrations()
+    {
+        // Arrange
+        await using var dbContext = TestDbContextFactory.Create();
+        var conference = await SeedConferenceAsync(dbContext);
+        var first = await SeedUserAsync(dbContext);
+        var second = await SeedUserAsync(dbContext);
+        var handler = new CreateRegistrationCommandHandler(dbContext, _currentUser);
+
+        // Act
+        _currentUser.UserId.Returns(first.Id);
+        await handler.Handle(new CreateRegistrationCommand(conference.Id), TestContext.Current.CancellationToken);
+        _currentUser.UserId.Returns(second.Id);
+        await handler.Handle(new CreateRegistrationCommand(conference.Id), TestContext.Current.CancellationToken);
+
+        // Assert
+        dbContext.Registrations.Select(r => r.TicketCode).Distinct().Should().HaveCount(2);
+    }
 }
