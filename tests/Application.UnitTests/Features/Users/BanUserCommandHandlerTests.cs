@@ -69,6 +69,42 @@ public sealed class BanUserCommandHandlerTests
     }
 
     [Fact]
+    public async Task Ban_Should_Overwrite_Temporary_Lockout_With_Permanent_Ban()
+    {
+        // Arrange
+        _user.LockoutEnabled = true;
+        _user.LockoutEnd = DateTimeOffset.UtcNow.AddMinutes(15);
+        _user.AccessFailedCount = 5;
+
+        // Act
+        var result = await _banHandler.Handle(new BanUserCommand(_user.Id), TestContext.Current.CancellationToken);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        _user.LockoutEnd.Should().Be(DateTimeOffset.MaxValue);
+        _user.AccessFailedCount.Should().Be(0);
+        _user.RefreshToken.Should().BeNull();
+        _user.RefreshTokenExpiryTime.Should().BeNull();
+        await _userManager.Received(1).UpdateAsync(_user);
+    }
+
+    [Fact]
+    public async Task Ban_Should_Return_AlreadyBanned_When_User_Is_Permanently_Banned()
+    {
+        // Arrange
+        _user.LockoutEnabled = true;
+        _user.LockoutEnd = DateTimeOffset.MaxValue;
+
+        // Act
+        var result = await _banHandler.Handle(new BanUserCommand(_user.Id), TestContext.Current.CancellationToken);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error!.Code.Should().Be("User.AlreadyBanned");
+        await _userManager.DidNotReceive().UpdateAsync(Arg.Any<ApplicationUser>());
+    }
+
+    [Fact]
     public async Task Ban_Should_Return_Forbidden_When_Admin_Bans_Themselves()
     {
         // Arrange
@@ -104,6 +140,22 @@ public sealed class BanUserCommandHandlerTests
         // Arrange
         _user.LockoutEnabled = true;
         _user.LockoutEnd = DateTimeOffset.MaxValue;
+
+        // Act
+        var result = await _unbanHandler.Handle(new UnbanUserCommand(_user.Id), TestContext.Current.CancellationToken);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        _user.LockoutEnd.Should().BeNull();
+        await _userManager.Received(1).UpdateAsync(_user);
+    }
+
+    [Fact]
+    public async Task Unban_Should_Clear_Temporary_Lockout()
+    {
+        // Arrange
+        _user.LockoutEnabled = true;
+        _user.LockoutEnd = DateTimeOffset.UtcNow.AddMinutes(15);
 
         // Act
         var result = await _unbanHandler.Handle(new UnbanUserCommand(_user.Id), TestContext.Current.CancellationToken);

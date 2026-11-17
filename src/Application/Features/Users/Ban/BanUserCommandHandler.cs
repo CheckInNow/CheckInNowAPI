@@ -22,7 +22,8 @@ public sealed class BanUserCommandHandler(UserManager<ApplicationUser> userManag
             return Result.Failure(Error.Forbidden("User.CannotModifySelf", "Administrators cannot ban themselves or change their own roles."));
         }
 
-        if (user.LockoutEnabled && user.LockoutEnd > DateTimeOffset.UtcNow)
+        // Only a permanent lockout is a ban. A temporary lockout after failed logins is overwritten.
+        if (user.LockoutEnd == DateTimeOffset.MaxValue)
         {
             return Result.Failure(Error.Conflict("User.AlreadyBanned", "The user is already banned."));
         }
@@ -30,6 +31,7 @@ public sealed class BanUserCommandHandler(UserManager<ApplicationUser> userManag
         // Account-level ban: permanent Identity lockout. No data is deleted.
         user.LockoutEnabled = true;
         user.LockoutEnd = DateTimeOffset.MaxValue;
+        user.AccessFailedCount = 0;
 
         // Revoke the refresh token so the banned user cannot renew the session.
         user.RefreshToken = null;

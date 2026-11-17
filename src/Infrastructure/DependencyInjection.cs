@@ -49,6 +49,9 @@ public static class DependencyInjection
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequiredLength = 6;
                 options.User.RequireUniqueEmail = true;
+                options.Lockout.AllowedForNewUsers = true;
+                options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
                 options.Tokens.EmailConfirmationTokenProvider = EmailConfirmationTokenProviderOptions.ProviderName;
             })
             .AddRoles<IdentityRole<Guid>>()
