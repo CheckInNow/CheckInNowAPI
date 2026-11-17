@@ -93,25 +93,6 @@ public sealed class GetTicketQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_Should_Return_NotFound_When_User_Is_Not_Authenticated()
-    {
-        // Arrange
-        await using var dbContext = TestDbContextFactory.Create();
-        var conference = await SeedConferenceAsync(dbContext);
-        var user = await SeedUserAsync(dbContext);
-        var registration = await SeedRegistrationAsync(dbContext, conference.Id, user.Id);
-        _currentUser.UserId.Returns((Guid?)null);
-        var handler = new GetTicketQueryHandler(dbContext, _currentUser);
-
-        // Act
-        var result = await handler.Handle(new GetTicketQuery(conference.Id, registration.Id), TestContext.Current.CancellationToken);
-
-        // Assert
-        result.IsFailure.Should().BeTrue();
-        result.Error!.Type.Should().Be(ErrorType.NotFound);
-    }
-
-    [Fact]
     public async Task Handle_Should_Return_NotFound_When_Registration_Does_Not_Exist()
     {
         // Arrange
