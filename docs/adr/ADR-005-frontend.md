@@ -89,7 +89,13 @@ Decyzja obejmuje trzy obszary: framework i narzędzie budowania, język programo
 
 ## Decyzja
 
-Wybrano **React** z **Vite** jako aplikację typu Single Page Application, napisaną w **TypeScript**, ze stylowaniem w **Tailwind CSS** i komponentami **shadcn/ui**. Wersje zostaną ustalone przy inicjalizacji projektu frontendowego.
+Wybrano **React 19.3.1** z **Vite 8.3.6** jako aplikację typu Single Page Application, napisaną w **TypeScript 6.0.3**, ze stylowaniem w **Tailwind CSS 3.4.19** i komponentami **shadcn/ui** (pakiet `shadcn` 4.23.0). Uzupełniają je:
+
+- **PostCSS 8.5.32** i **Autoprefixer 10.6.2** – przetwarzanie CSS,
+- **@base-ui/react 1.9.0** – bazowe komponenty pod shadcn/ui,
+- **lucide-react 1.70.0** – ikony,
+- **Geist 5.3.0** – czcionka,
+- **ESLint 10.14.0** z **typescript-eslint 8.72.1** – lintowanie.
 
 Vite zapewnia bardzo szybki czas uruchamiania środowiska deweloperskiego i budowania aplikacji. Świadomie zrezygnowano z frameworków typu Next.js, aby uniknąć zbędnego narzutu serwerowego, który skomplikowałby architekturę i komunikację z osobnym backendem (np. w kwestii obsługi sesji i CORS). TypeScript chroni przed błędami przy mapowaniu danych z REST API i minimalizuje ryzyko pomyłek przy pracy w pojedynkę na warstwie frontendowej. Tailwind CSS i shadcn/ui maksymalnie przyspieszają budowę widoków i ułatwiają tworzenie responsywnego interfejsu, w tym mobilnego skanera QR.
 
