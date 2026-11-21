@@ -1,0 +1,56 @@
+ID,Issue,PR,Tytuł,Typ,Historyjka,Priorytet,StoryPoints,Sprint,Status
+BE-01,,,"Initial project setup (Clean Architecture, Aspire, Docker Compose, CI)",Infrastruktura,,M,5,Sprint 1,Done
+BE-02,,,Add MediatR and the Result pattern,Infrastruktura,,M,2,Sprint 1,Done
+DOC-01,#45,#2,Add ADR-001,Dokumentacja,,M,3,Sprint 1,Done
+DOC-02,#3,#4,Fix ADRs,Dokumentacja,,M,2,Sprint 1,Done
+BE-03,#46,#5,Update the Postgres version,Infrastruktura,,S,1,Sprint 2,Done
+DOC-03,#6,#7,Add event storming documentation,Dokumentacja,,M,5,Sprint 2,Done
+BE-04,#8,"#9, #10",Add Google OAuth login,Funkcja,US-02,M,5,Sprint 2,Done
+BE-05,#11,#15,Add email sending (Mailgun + Mailpit for local dev),Funkcja,US-01,M,5,Sprint 2,Done
+BE-06,#12,#18,Add email confirmation,Funkcja,US-01,M,5,Sprint 2,Done
+BE-07,#13,#17,Add the Organizer role,Funkcja,US-14,M,2,Sprint 2,Done
+BE-08,#14,#21,Add the Conference entity and endpoints,Funkcja,US-03,M,5,Sprint 2,Done
+BE-09,#23,#25,Add rooms and speakers to a conference,Funkcja,"US-04, US-05",M,3,Sprint 2,Done
+BE-10,#19,#27,Add admin user management endpoints,Funkcja,US-14,M,5,Sprint 2,Done
+BE-11,#26,#28,Add sessions to a conference,Funkcja,US-06,M,8,Sprint 2,Done
+BE-12,#16,#30,Block locked-out users from logging in,Funkcja,US-01,M,2,Sprint 2,Done
+BE-13,#22,#34,Add my conferences endpoint for organizers,Funkcja,US-03,S,1,Sprint 2,Done
+BE-14,#32,#35,Add registration for a conference,Funkcja,US-07,M,5,Sprint 3,Done
+BE-15,#33,#40,Add a ticket for a registration,Funkcja,US-08,M,2,Sprint 3,Done
+BE-16,#31,#43,Configure account lockout and separate temporary lockout from a ban,Funkcja,US-14,M,2,Sprint 3,Done
+DOC-04,#20,#44,Add tech stack component versions to ADR-005: Frontend,Dokumentacja,,C,1,Sprint 3,Done
+BE-17,#38,,Add conference check-in,Funkcja,US-09,M,5,Sprint 3,In progress
+BE-18,#36,,Add my registrations endpoint,Funkcja,US-08,M,2,Sprint 3,Todo
+DOC-05,#47,,"Add product documentation (PRD, backlog, user stories, personas, process)",Dokumentacja,,M,5,Sprint 3,In progress
+FE-01,Front#1,,"Set up the frontend project (Vite, React, TypeScript, Tailwind, shadcn/ui, routing, API client)",Infrastruktura,,M,5,Sprint 3,Todo
+FE-02,Front#2,,"Add registration, login and email confirmation views",Funkcja,US-01,M,3,Sprint 3,Todo
+FE-03,Front#3,,Add Google login,Funkcja,US-02,M,2,Sprint 3,Todo
+BE-19,#39,,Add session check-in,Funkcja,US-09,M,3,Sprint 4,Backlog
+BE-20,#48,,Allow door staff to scan tickets,Funkcja,US-09,S,5,Sprint 4,Backlog
+BE-25,#49,,Add password reset,Funkcja,,S,3,Sprint 4,Backlog
+BE-21,#41,,Add favorite sessions,Funkcja,US-10,M,3,Sprint 4,Backlog
+BE-22,#59,,Warn about overlapping sessions in the plan,Funkcja,US-11,M,2,Sprint 4,Backlog
+BE-23,#37,,Add filtering conferences by time (upcoming / past),Funkcja,US-03,S,2,Sprint 4,Backlog
+BE-24,#50,,Create the administrator account in production,Infrastruktura,US-14,M,2,Sprint 4,Backlog
+FE-04,Front#4,,Add organizer views for creating and editing conferences,Funkcja,US-03,M,3,Sprint 4,Backlog
+FE-05,Front#5,,Add room management view,Funkcja,US-04,M,1,Sprint 4,Backlog
+FE-06,Front#6,,Add speaker management view,Funkcja,US-05,M,1,Sprint 4,Backlog
+FE-07,Front#7,,Add the public conference list and the agenda editor,Funkcja,US-06,M,5,Sprint 4,Backlog
+FE-08,Front#8,,Add conference registration and my registrations view,Funkcja,US-07,M,2,Sprint 4,Backlog
+BE-26,#51,,Add session ratings,Funkcja,US-12,M,5,Sprint 5,Backlog
+BE-27,#52,,Add conference statistics,Funkcja,US-13,M,5,Sprint 5,Backlog
+DOC-06,#53,,Add ADR-007: log storage,Dokumentacja,US-15,M,2,Sprint 5,Backlog
+BE-28,#54,,Add persistent logs and the admin logs endpoint,Funkcja,US-15,M,5,Sprint 5,Backlog
+FE-09,Front#9,,Add the ticket view with a QR code,Funkcja,US-08,M,2,Sprint 5,Backlog
+FE-10,Front#10,,Add the mobile QR ticket scanner,Funkcja,US-09,M,5,Sprint 5,Backlog
+FE-11,Front#11,,Add the my plan view,Funkcja,US-10,M,3,Sprint 5,Backlog
+FE-12,Front#12,,Mark overlapping sessions in the plan,Funkcja,US-11,M,1,Sprint 5,Backlog
+BE-29,#55,,Add editing and deleting rooms and speakers,Funkcja,"US-04, US-05",S,3,Sprint 6,Backlog
+BE-30,#24,,Centralize soft delete,Dług techniczny,,C,3,Sprint 6,Backlog
+BE-32,#58,,Move email templates to localized HTML files,Dług techniczny,,C,3,Sprint 6,Backlog
+BE-31,#56,,Review OpenAPI descriptions and response codes of all endpoints,Dokumentacja,,M,2,Sprint 6,Backlog
+DOC-07,#57,,Add technical documentation and a getting started guide,Dokumentacja,,S,3,Sprint 6,Backlog
+FE-13,Front#13,,Add session rating,Funkcja,US-12,M,2,Sprint 6,Backlog
+FE-14,Front#14,,Add the conference statistics view,Funkcja,US-13,M,3,Sprint 6,Backlog
+FE-15,Front#15,,Add the admin user management view,Funkcja,US-14,M,3,Sprint 6,Backlog
+FE-16,Front#16,,Add the admin logs view,Funkcja,US-15,M,2,Sprint 6,Backlog
