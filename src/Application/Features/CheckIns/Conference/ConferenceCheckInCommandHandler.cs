@@ -31,16 +31,16 @@ public sealed class ConferenceCheckInCommandHandler(IAppDbContext context, ICurr
                 Error.NotFound("Ticket.Invalid", "Invalid ticket."));
         }
 
-        if (rules.IsAlreadyScanned)
-        {
-            return Result.Failure<ConferenceCheckInResponse>(
-                Error.Conflict("Ticket.AlreadyScanned", "This ticket was already scanned."));
-        }
-
         if (!rules.IsUserScanningAllowed)
         {
             return Result.Failure<ConferenceCheckInResponse>(
                 Error.Forbidden("CheckIn.Forbidden", "You are not allowed to scan tickets."));
+        }
+
+        if (rules.IsAlreadyScanned)
+        {
+            return Result.Failure<ConferenceCheckInResponse>(
+                Error.Conflict("Ticket.AlreadyScanned", "This ticket was already scanned."));
         }
 
         if (!rules.IsConferenceStarted)
