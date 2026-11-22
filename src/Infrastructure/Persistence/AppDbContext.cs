@@ -15,6 +15,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
     public DbSet<Speaker> Speakers => Set<Speaker>();
     public DbSet<Session> Sessions => Set<Session>();
     public DbSet<Registration> Registrations => Set<Registration>();
+    public DbSet<ConferenceCheckIn> ConferenceCheckIns => Set<ConferenceCheckIn>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
