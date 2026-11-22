@@ -61,6 +61,8 @@ public sealed class ConferenceCheckInCommandHandler(IAppDbContext context, ICurr
             CheckedInAt = DateTimeOffset.UtcNow,
         };
 
+        context.ConferenceCheckIns.Add(checkIn);
+
         try
         {
             await context.SaveChangesAsync(cancellationToken);
@@ -78,8 +80,6 @@ public sealed class ConferenceCheckInCommandHandler(IAppDbContext context, ICurr
             return Result.Failure<ConferenceCheckInResponse>(
                 Error.Conflict("Ticket.AlreadyScanned", "This ticket was already scanned."));
         }
-
-        await context.SaveChangesAsync(cancellationToken);
         return Result.Success(new ConferenceCheckInResponse(
             checkIn.Id,
             checkIn.RegistrationId,
