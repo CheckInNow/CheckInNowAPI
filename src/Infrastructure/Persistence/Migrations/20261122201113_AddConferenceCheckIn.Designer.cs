@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20261122190148_AddConferenceCheckIn")]
+    [Migration("20261122201113_AddConferenceCheckIn")]
     partial class AddConferenceCheckIn
     {
         /// <inheritdoc />
@@ -182,7 +182,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("RegistrationId")
                         .IsUnique();
 
-                    b.ToTable("ConferenceCheckIn");
+                    b.ToTable("ConferenceCheckIns");
                 });
 
             modelBuilder.Entity("Domain.Entities.Registration", b =>

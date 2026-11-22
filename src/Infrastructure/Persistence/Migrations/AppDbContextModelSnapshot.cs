@@ -179,7 +179,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("RegistrationId")
                         .IsUnique();
 
-                    b.ToTable("ConferenceCheckIn");
+                    b.ToTable("ConferenceCheckIns");
                 });
 
             modelBuilder.Entity("Domain.Entities.Registration", b =>

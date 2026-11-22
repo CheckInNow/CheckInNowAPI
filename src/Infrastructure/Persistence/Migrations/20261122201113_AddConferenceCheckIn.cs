@@ -12,7 +12,7 @@ namespace Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "ConferenceCheckIn",
+                name: "ConferenceCheckIns",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -21,9 +21,9 @@ namespace Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ConferenceCheckIn", x => x.Id);
+                    table.PrimaryKey("PK_ConferenceCheckIns", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ConferenceCheckIn_Registrations_RegistrationId",
+                        name: "FK_ConferenceCheckIns_Registrations_RegistrationId",
                         column: x => x.RegistrationId,
                         principalTable: "Registrations",
                         principalColumn: "Id",
@@ -31,8 +31,8 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ConferenceCheckIn_RegistrationId",
-                table: "ConferenceCheckIn",
+                name: "IX_ConferenceCheckIns_RegistrationId",
+                table: "ConferenceCheckIns",
                 column: "RegistrationId",
                 unique: true);
         }
@@ -41,7 +41,7 @@ namespace Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ConferenceCheckIn");
+                name: "ConferenceCheckIns");
         }
     }
 }
