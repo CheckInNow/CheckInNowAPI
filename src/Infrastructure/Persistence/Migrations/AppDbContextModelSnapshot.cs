@@ -162,6 +162,26 @@ namespace Infrastructure.Migrations
                     b.ToTable("Conferences");
                 });
 
+            modelBuilder.Entity("Domain.Entities.ConferenceCheckIn", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CheckedInAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("RegistrationId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RegistrationId")
+                        .IsUnique();
+
+                    b.ToTable("ConferenceCheckIns");
+                });
+
             modelBuilder.Entity("Domain.Entities.Registration", b =>
                 {
                     b.Property<Guid>("Id")
@@ -458,6 +478,17 @@ namespace Infrastructure.Migrations
                     b.Navigation("Organizer");
                 });
 
+            modelBuilder.Entity("Domain.Entities.ConferenceCheckIn", b =>
+                {
+                    b.HasOne("Domain.Entities.Registration", "Registration")
+                        .WithOne("ConferenceCheckIn")
+                        .HasForeignKey("Domain.Entities.ConferenceCheckIn", "RegistrationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Registration");
+                });
+
             modelBuilder.Entity("Domain.Entities.Registration", b =>
                 {
                     b.HasOne("Domain.Entities.Conference", "Conference")
@@ -593,6 +624,11 @@ namespace Infrastructure.Migrations
                     b.Navigation("Sessions");
 
                     b.Navigation("Speakers");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Registration", b =>
+                {
+                    b.Navigation("ConferenceCheckIn");
                 });
 #pragma warning restore 612, 618
         }
