@@ -3,6 +3,7 @@ using Application.Features.Registrations.Create;
 using Application.Features.Registrations.Delete;
 using Application.Features.Registrations.Get;
 using Application.Features.Registrations.GetAll;
+using Application.Features.Registrations.GetMy;
 using Application.Features.Registrations.GetTicket;
 using Domain.Common;
 using MediatR;
@@ -63,6 +64,26 @@ public static class RegistrationEndpoints
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAuthorization();
+
+        var myGroup = app.MapGroup("/api/registrations")
+            .WithTags("Registrations");
+
+        myGroup.MapGet("/my", GetMyRegistrations)
+            .WithName("GetMyRegistrations")
+            .WithSummary("Get paginated registrations of the current user, ordered by conference start date (newest first).")
+            .Produces<PagedResult<MyRegistrationListItemResponse>>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .RequireAuthorization();
+    }
+
+    private static async Task<IResult> GetMyRegistrations(
+        [AsParameters] GetMyRegistrationsQuery query,
+        [FromServices] ISender sender,
+        CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(query, cancellationToken);
+        return result.IsSuccess ? TypedResults.Ok(result.Value) : result.ToProblemDetails();
     }
 
     private static async Task<IResult> GetRegistrations(
