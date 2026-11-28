@@ -4,6 +4,7 @@ using Api.Extensions;
 using Application;
 using Infrastructure;
 using Infrastructure.Persistence;
+using Microsoft.AspNetCore.HttpOverrides;
 using Scalar.AspNetCore;
 using Serilog;
 using ServiceDefaults;

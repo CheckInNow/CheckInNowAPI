@@ -1,20 +1,21 @@
 name: deploy
 
 on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "docs/**"
+      - "**.md"
   workflow_dispatch:
-    inputs:
-      tag:
-        description: "Image tag (not necessary)"
-        required: false
-        default: ""
 
 env:
   REGISTRY: ${{ vars.ACR_NAME }}.azurecr.io
-  IMAGE_NAME: cqrsboilerplate-api
+  IMAGE_NAME: checkinnowapi
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    environment: development
     permissions:
       contents: read
 
@@ -40,7 +41,6 @@ jobs:
           tags: |
             type=raw,value=${{ github.sha }}
             type=raw,value=latest
-            type=raw,value=${{ inputs.tag }},enable=${{ inputs.tag != '' }}
 
       - name: Build and push
         uses: docker/build-push-action@v6
