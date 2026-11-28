@@ -4,6 +4,7 @@ using Api.Extensions;
 using Application;
 using Infrastructure;
 using Infrastructure.Persistence;
+using Microsoft.AspNetCore.HttpOverrides;
 using Scalar.AspNetCore;
 using Serilog;
 using ServiceDefaults;
@@ -94,6 +95,11 @@ try
     builder.Services.AddProblemDetails();
 
     var app = builder.Build();
+
+    app.UseForwardedHeaders(new ForwardedHeadersOptions
+    {
+        ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+    });
 
     // Global exception handler
     app.UseExceptionHandler();
