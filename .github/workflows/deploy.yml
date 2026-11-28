@@ -10,7 +10,7 @@ on:
 
 env:
   REGISTRY: ${{ vars.ACR_NAME }}.azurecr.io
-  IMAGE_NAME: cqrsboilerplate-api
+  IMAGE_NAME: checkinnowapi
 
 jobs:
   build-and-push:
