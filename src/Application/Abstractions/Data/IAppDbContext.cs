@@ -15,5 +15,6 @@ public interface IAppDbContext
     DbSet<Session> Sessions { get; }
     DbSet<Registration> Registrations { get; }
     DbSet<ConferenceCheckIn> ConferenceCheckIns { get; }
+    DbSet<SessionCheckIn> SessionCheckIns { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

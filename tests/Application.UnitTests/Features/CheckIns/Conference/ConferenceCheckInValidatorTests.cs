@@ -1,7 +1,7 @@
 using Application.Features.CheckIns.Conference;
 using FluentAssertions;
 
-namespace Application.UnitTests.Features.CheckIns;
+namespace UnitTests.Features.CheckIns.Conference;
 
 public sealed class ConferenceCheckInValidatorTests
 {

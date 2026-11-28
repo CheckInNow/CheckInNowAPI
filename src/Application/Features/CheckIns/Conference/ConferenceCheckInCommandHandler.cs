@@ -1,9 +1,9 @@
 using Application.Abstractions.Data;
+using Application.Abstractions.Identity;
 using Application.Abstractions.Messaging;
 using Domain.Common;
-using Microsoft.EntityFrameworkCore;
 using Domain.Entities;
-using Application.Abstractions.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.CheckIns.Conference;
 

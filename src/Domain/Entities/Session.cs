@@ -15,4 +15,5 @@ public sealed class Session : AuditableEntity
     public Guid SpeakerId { get; set; }
     public Room Room { get; set; } = default!;
     public Guid RoomId { get; set; }
+    public ICollection<SessionCheckIn> SessionCheckIns { get; set; } = new List<SessionCheckIn>();
 }

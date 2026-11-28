@@ -307,6 +307,31 @@ namespace Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Domain.Entities.SessionCheckIn", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CheckedInAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("RegistrationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("SessionId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SessionId");
+
+                    b.HasIndex("RegistrationId", "SessionId")
+                        .IsUnique();
+
+                    b.ToTable("SessionCheckIns");
+                });
+
             modelBuilder.Entity("Domain.Entities.Speaker", b =>
                 {
                     b.Property<Guid>("Id")
@@ -546,6 +571,25 @@ namespace Infrastructure.Migrations
                     b.Navigation("Speaker");
                 });
 
+            modelBuilder.Entity("Domain.Entities.SessionCheckIn", b =>
+                {
+                    b.HasOne("Domain.Entities.Registration", "Registration")
+                        .WithMany("SessionCheckIns")
+                        .HasForeignKey("RegistrationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Session", "Session")
+                        .WithMany("SessionCheckIns")
+                        .HasForeignKey("SessionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Registration");
+
+                    b.Navigation("Session");
+                });
+
             modelBuilder.Entity("Domain.Entities.Speaker", b =>
                 {
                     b.HasOne("Domain.Entities.Conference", "Conference")
@@ -629,6 +673,13 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.Registration", b =>
                 {
                     b.Navigation("ConferenceCheckIn");
+
+                    b.Navigation("SessionCheckIns");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Session", b =>
+                {
+                    b.Navigation("SessionCheckIns");
                 });
 #pragma warning restore 612, 618
         }

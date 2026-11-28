@@ -1,0 +1,22 @@
+using Application.Features.CheckIns.Conference;
+using Application.Features.CheckIns.Session;
+using FluentAssertions;
+
+namespace Application.UnitTests.Features.CheckIns;
+
+public sealed class SessionCheckInValidatorTests
+{
+    private readonly SessionCheckInValidator _validator = new();
+
+    [Fact]
+    public void Validate_Should_Pass_For_Valid_Command()
+    {
+        _validator.Validate(new SessionCheckInCommand(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid())).IsValid.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Validate_Should_Fail_When_Ticket_Code_Is_Empty()
+    {
+        _validator.Validate(new SessionCheckInCommand(Guid.NewGuid(), Guid.NewGuid(), Guid.Empty)).IsValid.Should().BeFalse();
+    }
+}

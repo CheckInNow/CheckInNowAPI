@@ -10,11 +10,40 @@ internal static class CheckInTestData
         DateTimeOffset startDate,
         DateTimeOffset endDate)
     {
-        var conference = await Registrations.RegistrationTestData.SeedConferenceAsync(dbContext);
+        var conference = await Sessions.SessionTestData.SeedConferenceAsync(dbContext);
         conference.StartDate = startDate;
         conference.EndDate = endDate;
+        conference.OrganizerId = Registrations.RegistrationTestData.OrganizerId;
+
+        var room = await Sessions.SessionTestData.SeedRoomAsync(dbContext, conference.Id);
+
+        var speaker = await Sessions.SessionTestData.SeedSpeakerAsync(dbContext, conference.Id);
+
+        var sessionEnded = await Sessions.SessionTestData.SeedSessionAsync(dbContext, conference, room, speaker, startDate.AddMinutes(5), startDate.AddMinutes(10));
+        var sessionRunning = await Sessions.SessionTestData.SeedSessionAsync(dbContext, conference, room, speaker, startDate.AddMinutes(5), endDate.AddMinutes(-5));
+
+        conference.Rooms.Add(room);
+        conference.Speakers.Add(speaker);
+        conference.Sessions.Add(sessionEnded);
+        conference.Sessions.Add(sessionRunning);
+
         await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
         return conference;
+    }
+
+    public static Task<Session> SeedExtraSessionAsync(
+        AppDbContext dbContext,
+        Conference conference,
+        DateTimeOffset start,
+        DateTimeOffset end)
+    {
+        return Sessions.SessionTestData.SeedSessionAsync(
+            dbContext,
+            conference,
+            conference.Rooms.First(),
+            conference.Speakers.First(),
+            start,
+            end);
     }
 
     public static Task<Conference> SeedRunningConferenceAsync(AppDbContext dbContext)
@@ -28,7 +57,7 @@ internal static class CheckInTestData
         var checkIn = new ConferenceCheckIn
         {
             RegistrationId = registrationId,
-            CheckedInAt = DateTimeOffset.UtcNow
+            CheckedInAt = DateTimeOffset.UtcNow.AddMinutes(-1)
         };
         dbContext.ConferenceCheckIns.Add(checkIn);
         await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
